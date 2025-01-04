@@ -10,16 +10,16 @@ import Header from "./Header";
 function MainLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSidebarPopover, setIsSidebarPopover] = useState(false);
-  const [authorized, setAuthorized] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      setAuthorized(true);
-    } else {
-      setAuthorized(false);
-    }
-  }, [authorized]);
+  // const [authorized, setAuthorized] = useState(true);
+  //
+  // useEffect(() => {
+  //   const token = localStorage.getItem("authToken");
+  //   if (token) {
+  //     setAuthorized(true);
+  //   } else {
+  //     setAuthorized(false);
+  //   }
+  // }, [authorized]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -51,23 +51,21 @@ function MainLayout() {
         isSidebarPopover={isSidebarPopover}
       />
       <div className="flex flex-1 overflow-hidden">
-        {authorized && (
-          <div className={`${isSidebarOpen ? "block" : "hidden"} md:block`}>
-            <Sidebar
-              isOpen={isSidebarOpen}
-              toggleSidebar={toggleSidebar}
-              isSidebarPopover={isSidebarPopover}
-            />
-          </div>
-        )}
+        <div className={`${isSidebarOpen ? "block" : "hidden"} md:block`}>
+          <Sidebar
+            isOpen={isSidebarOpen}
+            toggleSidebar={toggleSidebar}
+            isSidebarPopover={isSidebarPopover}
+          />
+        </div>
 
         <div className="flex flex-col flex-1 overflow-hidden">
           <main
-            className={`flex-1  overflow-y-auto hidescroll bg-[#fdfafa] ${
-              authorized && "mt-24 p-4"
-            } min-h-[300px]`}
+            className={`flex-1  overflow-y-auto hidescroll bg-[#fdfafa] 
+              mt-24 p-4
+             min-h-[300px]`}
           >
-            {authorized && <Breadcrumbs />}
+            <Breadcrumbs />
 
             <Outlet />
           </main>

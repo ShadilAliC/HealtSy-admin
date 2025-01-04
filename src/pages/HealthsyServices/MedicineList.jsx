@@ -1,11 +1,11 @@
 import React from 'react'
+import Index from '../../components/HealthsyServices/MedicineList/Index';
 
 function MedicineList() {
-    console.log('00303');
     
   return (
     <div>
-      
+      <Index/>
     </div>
   )
 }

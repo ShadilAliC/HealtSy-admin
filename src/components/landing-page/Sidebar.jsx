@@ -32,7 +32,25 @@ const Sidebar = ({ isOpen, toggleSidebar, isSidebarPopover }) => {
   }, []);
 
   useEffect(() => {
-    setOpenSubmenus([]);
+    const findParentMenus = (items, targetPath, parents = []) => {
+      for (const item of items) {
+        if (item.path === targetPath) {
+          return parents;
+        }
+        if (item.submenu) {
+          const result = findParentMenus(item.submenu, targetPath, [
+            ...parents,
+            item.title,
+          ]);
+          if (result.length) return result;
+        }
+      }
+      return [];
+    };
+
+    const parentMenus = findParentMenus(menuItems, location.pathname);
+    setOpenSubmenus(parentMenus);
+
     if (window.innerWidth < 768) {
       toggleSidebar(false);
     }
@@ -57,12 +75,12 @@ const Sidebar = ({ isOpen, toggleSidebar, isSidebarPopover }) => {
         }`}
       >
         {hasSubmenu && !isSidebarPopover ? (
-          <div className="hover:scale-100 transition-transform  ">
+          <div className="hover:scale-100 transition-transform">
             <button
               onClick={() => toggleSubmenu(item.title)}
               className={`flex items-center justify-between w-full px-4 py-3 text-left rounded-md  ${
                 isOpen
-                  ? "bg-primary text-white"
+                  ? " text-white"
                   : "text-text_color hover:bg-primary hover:text-white"
               }`}
               style={{ paddingLeft: `${depth * 1}rem` }}
@@ -88,7 +106,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isSidebarPopover }) => {
         ) : (
           <button
             onClick={() => handleNavigation(item.path)}
-            className={`flex items-center px-4 py-3 text-sm rounded-md w-full  ${
+            className={`flex items-center px-4 py-3 text-sm rounded-md w-full ${
               isActive
                 ? "bg-primary text-white"
                 : "text-text_color hover:bg-primary hover:text-white"

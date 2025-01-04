@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Plus, Search, ChevronDown, RefreshCw } from "lucide-react";
+import { Plus, Search, ChevronDown, RefreshCw, Edit2, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { deleteSalt, getSaltMolecule } from "../../../../api/HealthSyServicesApi";
 import DynamicTable from "../../../ui/Table";
@@ -7,8 +7,10 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import Pagination from "../../../../common/Pagination";
 import DeleteModal from "../../../../common/DeleteModal";
 import toast from "react-hot-toast";
+
 import { useMastersContext } from "../../../../context/MastersContext";
 import AlphabetFilter from "../../../../common/AlphabetFilter";
+import { DotsSVG } from "../../../ui/Dots";
 function Salt() {
   const tableRef = useRef(null);
   const navigate = useNavigate();
@@ -19,6 +21,7 @@ function Salt() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState();
+  const [ActionUser, setActionUser] = useState(null);
   const [searchText, setSearchText] = useState("");
   const [salts, setSalts] = useState([]);
   const [selectedLetter, setSelectedLetter] = useState("");
@@ -49,7 +52,9 @@ function Salt() {
   const handleSearch = (e) => {
     setSearchText(e.target.value);
   };
-
+  const ActionDropdown = (id) => {
+    setActionUser((prev) => (prev === id ? null : id));
+  };
   const createSalt = () => {
     setAddAction("Add Salt/Molecule");
     navigate("salt-molecule/add-salt-molecule");
@@ -129,45 +134,100 @@ function Salt() {
       header: "S.No",
       render: (_, __, index) => (currentPage - 1) * itemsPerPage + index + 1,
     },
-    { key: "name", header: "Salt / Molecule Name" },
-    { key: "therapeutic_classification", header: "Therapeutic Classification" },
     {
       key: "status",
-      header: "Status",
+      header: "Status & Actions",
       render: (_, user) => (
-        <span
-          className={`p-1 rounded-md ${
-            user.status === true
-              ? "text-[#158844] bg-[#E8F7EE] "
-              : "text-[#C1A53F] bg-[#FCF5DC]"
-          } font-semibold`}
-        >
-          {user.status === true ? "Active" : "Inactive"}
-        </span>
-      ),
-    },
-    {
-      key: "action",
-      header: "Action",
-      render: (_, user) => (
-        <div className="flex gap-1">
-          <button
-            onClick={() => {
-              handleEdit(user._id);
-            }}
-            className="bg-blue-500 text-xs text-white rounded-md p-2 hover:scale-105 transform transition-all ease-in-out duration-300 hover:shadow-md cursor-pointer"
+        <div className="flex gap-4">
+          <div
+            className={`w-[40%] flex items-center space-x-2 rounded-md p-1 ${
+              user.status
+                ? "text-[#158844] bg-[#E8F7EE]"
+                : "text-[#C1A53F] bg-[#FCF5DC]"
+            }`}
           >
-            <FaEdit />
-          </button>
-          <button
-            onClick={() => {handleDelete(user._id)}}
-            className="bg-red-500 text-xs hover:scale-105 transform transition-all ease-in-out duration-300 hover:shadow-md cursor-pointer text-white rounded-md p-2"
-          >
-            <FaTrash />
-          </button>
+            <DotsSVG active={user.status} />
+            <span className="">{user.status ? "Active" : "Inactive"}</span>
+          </div>
+
+          <div className="relative">
+            <button
+              onClick={() => ActionDropdown(user._id)}
+              className="cursor-pointer focus:outline-none"
+            >
+              <svg
+                width="14"
+                height="4"
+                viewBox="0 0 14 4"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M13.4874 0.512567C12.804 -0.170848 11.696 -0.170848 11.0126 0.512567C10.3291 1.19598 10.3291 2.30402 11.0126 2.98744C11.696 3.67085 12.804 3.67085 13.4874 2.98744C14.1709 2.30405 14.1709 1.19601 13.4874 0.512567Z"
+                  fill="#4D4D4D"
+                />
+                <path
+                  d="M8.23744 0.512567C7.55402 -0.170848 6.44598 -0.170848 5.76257 0.512567C5.07915 1.19598 5.07915 2.30402 5.76257 2.98744C6.44598 3.67085 7.55402 3.67085 8.23744 2.98744C8.92085 2.30405 8.92085 1.19601 8.23744 0.512567Z"
+                  fill="#4D4D4D"
+                />
+                <path
+                  d="M2.98744 0.512567C2.30402 -0.170848 1.19598 -0.170848 0.512564 0.512567C-0.170852 1.19598 -0.170852 2.30402 0.512564 2.98744C1.19598 3.67085 2.30402 3.67085 2.98744 2.98744C3.67085 2.30405 3.67085 1.19601 2.98744 0.512567Z"
+                  fill="#4D4D4D"
+                />
+              </svg>
+            </button>
+            {ActionUser === user._id && (
+              <div className="absolute left-0 mt-2 bg-white shadow-md rounded-md w-32 z-10">
+                <ul className="py-1 p-2 space-y-1">
+                  <li
+                    className="flex items-center gap-2 px-4 py-2 bg-[#EFF8FE] text-[#4E91C2] text-[14px] cursor-pointer"
+                    onClick={() => handleEdit(user._id)}
+                  >
+                    <Edit2 className="w-4 h-4" />
+                    <span>Edit</span>
+                  </li>
+
+                  <li
+                    className="flex items-center gap-2 px-4 py-2 bg-[#FDE6E6] text-[#EB0000] text-[14px]  cursor-pointer"
+                    onClick={() => handleDelete(user._id)}
+                  >
+                    <Trash className="w-4 h-4" />
+                    Delete
+                  </li>
+                  <li
+                    className={`flex items-center gap-2 px-4 py-2 text-[14px]  cursor-pointer ${
+                      user.status
+                        ? "text-[#158844] bg-[#E8F7EE]"
+                        : "text-[#C1A53F] bg-[#FCF5DC]"
+                    }`}
+                    onClick={() => handleDelete(user._id)}
+                  >
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 9 10"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-4 h-4"
+                    >
+                      <path
+                        d="M4.85742 0.9375C2.61738 0.9375 0.794922 2.75996 0.794922 5C0.794922 7.24004 2.61738 9.0625 4.85742 9.0625C7.09746 9.0625 8.91992 7.24004 8.91992 5C8.91992 2.75996 7.09746 0.9375 4.85742 0.9375ZM6.32832 6.0291C6.35856 6.05783 6.38274 6.09232 6.39944 6.13055C6.41614 6.16877 6.42502 6.20995 6.42555 6.25166C6.42609 6.29336 6.41827 6.33476 6.40255 6.3734C6.38684 6.41203 6.36354 6.44713 6.33405 6.47663C6.30456 6.50612 6.26945 6.52941 6.23082 6.54513C6.19218 6.56084 6.15079 6.56867 6.10908 6.56813C6.06737 6.5676 6.02619 6.55872 5.98797 6.54202C5.94975 6.52532 5.91525 6.50114 5.88652 6.4709L4.85742 5.44199L3.82832 6.4709C3.76924 6.52703 3.69057 6.55786 3.60908 6.55682C3.52759 6.55577 3.44973 6.52294 3.39211 6.46531C3.33448 6.40769 3.30165 6.32983 3.3006 6.24834C3.29956 6.16686 3.33039 6.08818 3.38652 6.0291L4.41543 5L3.38652 3.9709C3.33039 3.91182 3.29956 3.83314 3.3006 3.75166C3.30165 3.67017 3.33448 3.59231 3.39211 3.53469C3.44973 3.47706 3.52759 3.44423 3.60908 3.44318C3.69057 3.44214 3.76924 3.47297 3.82832 3.5291L4.85742 4.55801L5.88652 3.5291C5.94561 3.47297 6.02428 3.44214 6.10577 3.44318C6.18725 3.44423 6.26511 3.47706 6.32274 3.53469C6.38036 3.59231 6.4132 3.67017 6.41424 3.75166C6.41528 3.83314 6.38445 3.91182 6.32832 3.9709L5.29941 5L6.32832 6.0291Z"
+                        fill={user.status ? "#158844" : "#C1A53F"}
+                      />
+                    </svg>
+
+                    {user.status ? "Active" : "Inactive"}
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
       ),
     },
+    { key: "name", header: "Salt / Molecule Name" },
+    { key: "therapeutic_classification", header: "Therapeutic Classification" },
+  
   ];
 
   return (
@@ -269,17 +329,26 @@ function Salt() {
             </span>
           </div>
         </div>
-
         <button
           onClick={createSalt}
           type="button"
-          className="relative flex h-10 w-full sm:w-[150px] items-center justify-between border rounded-lg border-btn_bg bg-btn_bg text-[13px] transition-all duration-300 hover:bg-btn_bg"
+          className="sm:absolute sm:top-28 sm:right-7 z-[9999] flex h-10 w-full sm:w-[172px] items-center justify-center border rounded-lg border-btn_bg bg-btn_bg text-[13px] transition-all duration-300 hover:bg-btn_bg"
         >
-          <span className="flex-1 px-4 font-Mulish text-white transition-all duration-300 group-hover:text-transparent">
-            Add Salt / Molecule
-          </span>
-          <span className="absolute right-0 top-0 flex h-full w-[39px] items-center justify-center rounded-lg bg-btn_bg transition-all duration-300 hover:w-full hover:translate-x-0 active:bg-[#2e8644]">
-            <Plus className="h-6 w-6 stroke-white stroke-2" />
+          <svg
+            className="h-5 w-5"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9.85742 0.25C4.48133 0.25 0.107422 4.62391 0.107422 10C0.107422 15.3761 4.48133 19.75 9.85742 19.75C15.2335 19.75 19.6074 15.3761 19.6074 10C19.6074 4.62391 15.2335 0.25 9.85742 0.25ZM13.6074 10.75H10.6074V13.75C10.6074 13.9489 10.5284 14.1397 10.3878 14.2803C10.2471 14.421 10.0563 14.5 9.85742 14.5C9.65851 14.5 9.46774 14.421 9.32709 14.2803C9.18644 14.1397 9.10742 13.9489 9.10742 13.75V10.75H6.10742C5.90851 10.75 5.71774 10.671 5.57709 10.5303C5.43644 10.3897 5.35742 10.1989 5.35742 10C5.35742 9.80109 5.43644 9.61032 5.57709 9.46967C5.71774 9.32902 5.90851 9.25 6.10742 9.25H9.10742V6.25C9.10742 6.05109 9.18644 5.86032 9.32709 5.71967C9.46774 5.57902 9.65851 5.5 9.85742 5.5C10.0563 5.5 10.2471 5.57902 10.3878 5.71967C10.5284 5.86032 10.6074 6.05109 10.6074 6.25V9.25H13.6074C13.8063 9.25 13.9971 9.32902 14.1378 9.46967C14.2784 9.61032 14.3574 9.80109 14.3574 10C14.3574 10.1989 14.2784 10.3897 14.1378 10.5303C13.9971 10.671 13.8063 10.75 13.6074 10.75Z"
+              fill="white"
+            />
+          </svg>
+          <span className="pl-2 font-Mulish text-white transition-all duration-300 group-hover:text-transparent">
+          Add Salt / Molecule
           </span>
         </button>
       </div>

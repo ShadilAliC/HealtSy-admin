@@ -102,7 +102,7 @@ if (addAction) {
 
 currentPageTitle = currentPageTitle.replace(/-/g, ' ');
   return (
-    <nav className="w-full " aria-label="breadcrumb">
+    <nav className="w-full relative z-10 " aria-label="breadcrumb">
       <div className="min-w-7xl mx-auto px-4 sm:px-6 lg:px-4 flex items-center justify-between">
         <h1 className="text-[20px] pb-2 font-Mulish   font-bold text-black">
           {currentPageTitle}

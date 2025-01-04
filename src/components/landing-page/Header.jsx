@@ -4,25 +4,25 @@ import admin from "../../../src/assets/admin.png";
 
 function Header({ toggleSidebar, setIsSidebarPopover, isSidebarPopover }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [authorized, setAuthorized] = useState(false);
+  // const [authorized, setAuthorized] = useState(false);
 
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      setAuthorized(true);
-    } else {
-      setAuthorized(false);
-    }
-  }, [authorized]);
+  // useEffect(() => {
+  //   const token = localStorage.getItem("authToken");
+  //   if (token) {
+  //     setAuthorized(true);
+  //   } else {
+  //     setAuthorized(false);
+  //   }
+  // }, [authorized]);
 
-  const handleLogout = async () => {
-    try {
-      localStorage.removeItem("authToken"); 
-      window.location.reload(); 
-    } catch (err) {
-      console.error("Error handling logout:", err);
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     localStorage.removeItem("authToken"); 
+  //     window.location.reload(); 
+  //   } catch (err) {
+  //     console.error("Error handling logout:", err);
+  //   }
+  // };
 
   return (
     <div className="fixed top-0 left-0 w-full bg-white border-b shadow-sm z-50">
@@ -55,7 +55,7 @@ function Header({ toggleSidebar, setIsSidebarPopover, isSidebarPopover }) {
             className="h-8 mr-14 lg:ml-12 w-auto sm:h-10 md:h-12"
           />
         </div>
-        {authorized && (
+        {/* {authorized && ( */}
           <div className="flex items-center space-x-4">
             <div className=" font-Mulish">
               <CurrentTime />
@@ -97,7 +97,7 @@ function Header({ toggleSidebar, setIsSidebarPopover, isSidebarPopover }) {
               )}
             </div>
           </div>
-        )}
+        {/* // )} */}
       </div>
     </div>
   );

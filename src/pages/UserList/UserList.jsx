@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
-import * as XLSX from "xlsx";
+// import * as XLSX from "xlsx";
 import DynamicTable from "../../components/ui/Table";
 import ViewData from "../../components/ui/ViewData";
 import { getUserDetail, getUsers } from "../../api/AuthApi";

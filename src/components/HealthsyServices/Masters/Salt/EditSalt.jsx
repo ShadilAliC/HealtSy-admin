@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
-import { getSaltMoleculeById, updateSaltMolecule } from "../../../../api/HealthSyServicesApi";
+import {
+  getSaltMoleculeById,
+  updateSaltMolecule,
+} from "../../../../api/HealthSyServicesApi";
 import { useMastersContext } from "../../../../context/MastersContext";
+import MandatoryField from "../../../../common/MandatoryField";
 
 function EditSalt() {
   const { id } = useParams();
@@ -17,12 +21,15 @@ function EditSalt() {
     handleSubmit,
     formState: { errors },
     setValue,
+    control,
   } = useForm();
 
   useEffect(() => {
     const fetchSaltData = async () => {
       try {
         const res = await getSaltMoleculeById(id);
+        console.log(res.data, "oow");
+
         if (res.success) {
           setSaltData(res.data);
           setValue("name", res.data.name);
@@ -44,6 +51,11 @@ function EditSalt() {
 
   const onSubmit = async (data) => {
     try {
+      if (data.status === "Active") {
+        data.status = true;
+      } else {
+        data.status = false;
+      }
       const res = await updateSaltMolecule(data, id);
       if (res.success) {
         Swal.fire({
@@ -53,21 +65,23 @@ function EditSalt() {
         });
         setSelectedTab("salt");
         setAddAction("");
-        navigate("/heathSy-services/order-medicines/masters"); 
+        navigate("/healthsy-services/order-medicines/masters");
       } else {
         toast.error("Failed to update molecule");
       }
     } catch (err) {
-      console.error("Error during update:", err);  
-      toast.error(err.message || "An error occurred while updating the molecule");
+      console.error("Error during update:", err);
+      toast.error(
+        err.message || "An error occurred while updating the molecule"
+      );
     }
   };
-  
 
   const onclose = () => {
     setSelectedTab("salt");
     setAddAction("");
-    navigate("/heathSy-services/order-medicines/masters");
+
+    navigate("/healthsy-services/order-medicines/masters");
   };
 
   return (
@@ -80,7 +94,7 @@ function EditSalt() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label htmlFor="name" className="block font-medium">
-                Molecule Name
+                Molecule Name <MandatoryField />
               </label>
               <input
                 id="name"
@@ -99,7 +113,7 @@ function EditSalt() {
                 htmlFor="therapeutic_classification"
                 className="block font-medium"
               >
-                Therapeutic Classification
+                Therapeutic Classification <MandatoryField />
               </label>
               <input
                 id="therapeutic_classification"
@@ -115,37 +129,51 @@ function EditSalt() {
               )}
             </div>
           </div>
-          <div className="p-1 flex flex-col font-poppins">
-            <h1 className="mr-3 font-medium">Status</h1>
-            <div className="flex items-center">
-              <div className="relative flex items-center font-poppins">
-                <input
-                  id="status"
-                  type="checkbox"
-                  {...register("status")}
-                  className="peer h-4 w-4 appearance-none border border-gray-300 rounded bg-white checked:bg-primary checked:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
+          <div>
+            <label className="block mb-2 text-[14px] font-Mulish text-[#4D4D4D]">
+              Status <MandatoryField />
+            </label>
+            <div className="flex space-x-4">
+              <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-[#FAE8EF]">
+                <Controller
+                  name="status"
+                  control={control}
+                  defaultValue={saltData?.status ? "Active" : "Non-Active"}
+                  render={({ field }) => (
+                    <input
+                      {...field}
+                      type="radio"
+                      value="Active"
+                      className="hidden peer"
+                    />
+                  )}
                 />
-                <svg
-                  className="absolute w-3 h-3 pointer-events-none hidden peer-checked:block stroke-white left-0.5 top-0.5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </div>
-              <label
-                htmlFor="status"
-                className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-              >
-                Active
+                <span className="text-gray-900 peer-checked:text-primary">
+                  Active
+                </span>
+              </label>
+
+              <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-orange-600">
+                <Controller
+                  name="status"
+                  control={control}
+                  defaultValue={saltData?.status ? "Active" : "Non-Active"}
+                  render={({ field }) => (
+                    <input
+                      {...field}
+                      type="radio"
+                      value="Non-Active"
+                      className="hidden peer"
+                    />
+                  )}
+                />
+                <span className="text-gray-900 peer-checked:text-primary">
+                  Non-Active
+                </span>
               </label>
             </div>
           </div>
+
           <div className="flex gap-2">
             <button
               onClick={onclose}

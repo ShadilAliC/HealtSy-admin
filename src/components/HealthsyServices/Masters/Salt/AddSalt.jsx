@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm ,Controller } from "react-hook-form";
 import MandatoryField from "../../../../common/MandatoryField";
 import { useNavigate } from "react-router-dom";
 import { useMastersContext } from "../../../../context/MastersContext";
@@ -15,34 +15,39 @@ function AddSalt() {
   const {
     register,
     handleSubmit,
+    control ,
     formState: { errors },
   } = useForm();
 
   const onSubmit = async (data) => {
     try {
-      console.log(data);
+      if (data.status === "Active") {
+        data.status = true;
+      } else {
+        data.status = false;
+      }
+
       const res = await createSaltMolecule(data);
       if (res.success) {
         Swal.fire({
-            icon: "success",
-            title: "New Molecule Added Successfully",
-            customClass: {
-                icon: "custom-success-icon", 
-              },
-          });
+          icon: "success",
+          title: "New Molecule Added Successfully",
+          customClass: {
+            icon: "custom-success-icon",
+          },
+        });
         toast.success(res.message);
         setSelectedTab("salt");
-        navigate("/heathSy-services/order-medicines/masters");
+        navigate("/healthsy-services/order-medicines/masters");
       }
-    //   console.log(res, "ooeoe");
     } catch (err) {
-        toast.error(err.message);
+      toast.error(err.message);
     }
   };
   const onclose = () => {
     setSelectedTab("salt");
     setAddAction("");
-    navigate("/heathSy-services/order-medicines/masters");
+    navigate("/healthsy-services/order-medicines/masters");
   };
 
   return (
@@ -89,7 +94,7 @@ function AddSalt() {
             )}
           </div>
         </div>
-        <div className="p-1 flex flex-col font-poppins">
+        {/* <div className="p-1 flex flex-col font-poppins">
           <h1 className="mr-3 font-medium">Status</h1>
           <div className="flex items-center">
             <div className="relative flex items-center font-poppins">
@@ -119,7 +124,52 @@ function AddSalt() {
               Active
             </label>
           </div>
+        </div> */}
+        <div>
+        <label className="block mb-2 text-[14px] font-Mulish text-[#4D4D4D]">
+          Status <MandatoryField />
+        </label>
+        <div className="flex space-x-4">
+          <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-[#FAE8EF]">
+            <Controller
+              name="status"
+              control={control}
+              defaultValue="Active"
+              render={({ field }) => (
+                <input
+                  {...field}
+                  type="radio"
+                  value="Active"
+                  className="hidden peer"
+                />
+              )}
+            />
+            <span className="text-gray-900 peer-checked:text-primary ">
+              Active
+            </span>
+          </label>
+
+          <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-orange-600">
+            <Controller
+              name="status"
+              control={control}
+              defaultValue="Active"
+              render={({ field }) => (
+                <input
+                  {...field}
+                  type="radio"
+                  value="Non-Active"
+                  className="hidden peer"
+                />
+              )}
+            />
+            <span className="text-gray-900 peer-checked:text-primary">
+              Non-Active
+            </span>
+          </label>
         </div>
+      </div>
+
         <div className="flex gap-2">
           <button
             onClick={onclose}
@@ -137,7 +187,7 @@ function AddSalt() {
           </button>
         </div>
       </form>
-      <Toaster/>
+      <Toaster />
     </div>
   );
 }

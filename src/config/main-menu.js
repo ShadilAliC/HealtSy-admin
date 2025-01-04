@@ -1,4 +1,4 @@
-import { Home, Users, Settings, Pill} from 'lucide-react';
+import { Home, Settings, Pill} from 'lucide-react';
 
 export const menuItems = [
   {
@@ -6,30 +6,23 @@ export const menuItems = [
     icon: Home,
     path: "/dashboard",
   },
-  {
-    title: "Users",
-    icon: Users,
-    path: "/user-list",
-  },
- 
+  
   {
     title: "HeathSy Services",
     icon: Settings,
-    path: "/heathSy-services",
+    path: "/healthsy-services",
     submenu: [
-      { 
-        title: "Order Medicine", 
+      {
+        title: "Order Medicine",
         icon: Pill,
         path: null,
         submenu: [
-          { title: "Masters", path: "/heathSy-services/order-medicines/masters" },
-          { title: "Medicine List", path: "/heathSy-services/order-medicine/medicine-list" },
-         
-        ]
+          { title: "Masters", path: "/healthsy-services/order-medicines/masters" },
+          { title: "Medicine List", path: "/healthsy-services/order-medicines/medicine-list" },
+        ],
       },
-      
-      
     ],
-  }
+  },
 ];
+
 

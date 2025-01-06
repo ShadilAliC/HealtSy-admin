@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const Pagination = ({
   currentPage,
@@ -13,28 +13,33 @@ const Pagination = ({
 
   return (
     <div className="w-full flex items-center justify-end">
-      <div className="flex items-center border border-primary rounded-md p-2">
-        <div className="text-sm mr-4">
-          <span className="text-[#181423]">
-            {startItem}-{endItem}
+      <div className="flex items-center border border-primary rounded-lg overflow-hidden">
+        <div className="px-4 py-2 text-sm flex items-center space-x-1">
+          <span className="font-medium text-primary">
+            {startItem} - {endItem}
           </span>
-          <span className="text-[#797979]"> of {totalItems} </span>
+          <span className="text-muted-foreground"> of {totalItems} </span>
         </div>
-        <div className="flex items-center space-x-2">
+
+        <div className="h-full w-px bg-border"></div>
+
+        <div className="flex items-center">
           <button
-            className="p-1 rounded-md hover:bg-gray-100 disabled:opacity-50"
+            className="p-2 hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50"
             onClick={() => onPageChange(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
+            aria-label="Previous page"
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-4 w-4" />
           </button>
           <button
-            className="p-1 rounded-md hover:bg-gray-100 disabled:opacity-50"
+            className="p-2 hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50"
             onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
+            aria-label="Next page"
           >
-            <ChevronRight className="h-5 w-5" />
-          </button> 
+            <ChevronRight className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </div>
@@ -42,4 +47,3 @@ const Pagination = ({
 };
 
 export default Pagination;
-

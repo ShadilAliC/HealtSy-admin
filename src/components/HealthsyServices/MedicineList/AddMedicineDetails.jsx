@@ -164,14 +164,14 @@ function MedicineDetails({ setSelectedTab }) {
                 Stock <MandatoryField />
               </label>
               <div className="flex space-x-4">
-                <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-[#FAE8EF]">
+                <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer peer">
                   <input
                     type="radio"
                     name="medicineStatus"
                     value="Available"
                     className="hidden peer"
                   />
-                  <span className="text-gray-900 peer-checked:text-primary ">
+                  <span className="text-gray-900 peer-checked:text-primary peer-checked:bg-[#FAE8EF] w-full h-full flex items-center justify-center">
                     Available
                   </span>
                 </label>
@@ -183,7 +183,7 @@ function MedicineDetails({ setSelectedTab }) {
                     value="Not-Available"
                     className="hidden peer"
                   />
-                  <span className="text-gray-900 peer-checked:text-primary">
+                  <span className="text-gray-900 peer-checked:text-primary peer-checked:bg-[#FAE8EF] w-full h-full flex items-center justify-center">
                     Not Available
                   </span>
                 </label>
@@ -202,7 +202,7 @@ function MedicineDetails({ setSelectedTab }) {
                     value="Active"
                     className="hidden peer"
                   />
-                  <span className="text-gray-900 peer-checked:text-primary ">
+                  <span className="text-gray-900 peer-checked:text-primary peer-checked:bg-[#FAE8EF] w-full h-full flex items-center justify-center">
                     Rx
                   </span>
                 </label>
@@ -214,7 +214,7 @@ function MedicineDetails({ setSelectedTab }) {
                     value="Non-Active"
                     className="hidden peer"
                   />
-                  <span className="text-gray-900 peer-checked:text-primary">
+                  <span className="text-gray-900 peer-checked:text-primary peer-checked:bg-[#FAE8EF] w-full h-full flex items-center justify-center">
                     Non-Rx
                   </span>
                 </label>
@@ -233,7 +233,7 @@ function MedicineDetails({ setSelectedTab }) {
                     value="Active"
                     className="hidden peer"
                   />
-                  <span className="text-gray-900 peer-checked:text-primary ">
+                  <span className="text-gray-900 peer-checked:text-primary peer-checked:bg-[#FAE8EF] w-full h-full flex items-center justify-center">
                     Active
                   </span>
                 </label>
@@ -245,7 +245,7 @@ function MedicineDetails({ setSelectedTab }) {
                     value="Non-Active"
                     className="hidden peer"
                   />
-                  <span className="text-gray-900 peer-checked:text-primary">
+                  <span className="text-gray-900 peer-checked:text-primary peer-checked:bg-[#FAE8EF] w-full h-full flex items-center justify-center">
                     Non-Active
                   </span>
                 </label>
@@ -416,7 +416,7 @@ function MedicineDetails({ setSelectedTab }) {
                     htmlFor="email"
                     className="block mb-2 text-[14px] font-Mulish text-[#000000]"
                   >
-                    MRP Per Unit <MandatoryField />
+                    Unit <MandatoryField />
                   </label>
                   <input
                     type="email"
@@ -481,7 +481,7 @@ function MedicineDetails({ setSelectedTab }) {
                         value="Active"
                         className="hidden peer"
                       />
-                      <span className="text-gray-900 peer-checked:text-primary ">
+                      <span className="text-gray-900 peer-checked:text-primary peer-checked:bg-[#FAE8EF] w-full h-full flex items-center justify-center">
                         Yes
                       </span>
                     </label>
@@ -493,7 +493,7 @@ function MedicineDetails({ setSelectedTab }) {
                         value="Non-Active"
                         className="hidden peer"
                       />
-                      <span className="text-gray-900 peer-checked:text-primary">
+                      <span className="text-gray-900 peer-checked:text-primary peer-checked:bg-[#FAE8EF] w-full h-full flex items-center justify-center">
                         No
                       </span>
                     </label>

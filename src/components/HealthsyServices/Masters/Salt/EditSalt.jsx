@@ -28,8 +28,6 @@ function EditSalt() {
     const fetchSaltData = async () => {
       try {
         const res = await getSaltMoleculeById(id);
-        console.log(res.data, "oow");
-
         if (res.success) {
           setSaltData(res.data);
           setValue("name", res.data.name);
@@ -148,7 +146,7 @@ function EditSalt() {
                     />
                   )}
                 />
-                <span className="text-gray-900 peer-checked:text-primary">
+                <span className="text-gray-900 peer-checked:text-primary peer-checked:bg-[#FAE8EF] w-full h-full flex items-center justify-center">
                   Active
                 </span>
               </label>
@@ -167,7 +165,7 @@ function EditSalt() {
                     />
                   )}
                 />
-                <span className="text-gray-900 peer-checked:text-primary">
+                <span className="text-gray-900 peer-checked:text-primary peer-checked:bg-[#FAE8EF] w-full h-full flex items-center justify-center">
                   Non-Active
                 </span>
               </label>

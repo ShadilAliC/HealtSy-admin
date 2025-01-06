@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useForm ,Controller } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import MandatoryField from "../../../../common/MandatoryField";
 import { useNavigate } from "react-router-dom";
 import { useMastersContext } from "../../../../context/MastersContext";
@@ -15,7 +15,7 @@ function AddSalt() {
   const {
     register,
     handleSubmit,
-    control ,
+    control,
     formState: { errors },
   } = useForm();
 
@@ -126,49 +126,49 @@ function AddSalt() {
           </div>
         </div> */}
         <div>
-        <label className="block mb-2 text-[14px] font-Mulish text-[#4D4D4D]">
-          Status <MandatoryField />
-        </label>
-        <div className="flex space-x-4">
-          <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-[#FAE8EF]">
-            <Controller
-              name="status"
-              control={control}
-              defaultValue="Active"
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="radio"
-                  value="Active"
-                  className="hidden peer"
-                />
-              )}
-            />
-            <span className="text-gray-900 peer-checked:text-primary ">
-              Active
-            </span>
+          <label className="block mb-2 text-[14px] font-Mulish text-[#4D4D4D]">
+            Status <MandatoryField />
           </label>
+          <div className="flex space-x-4">
+            <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-[#FAE8EF]">
+              <Controller
+                name="status"
+                control={control}
+                defaultValue="Active"
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="radio"
+                    value="Active"
+                    className="hidden peer"
+                  />
+                )}
+              />
+              <span className="text-gray-900 peer-checked:text-primary peer-checked:bg-[#FAE8EF] w-full h-full flex items-center justify-center">
+                Active
+              </span>
+            </label>
 
-          <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-orange-600">
-            <Controller
-              name="status"
-              control={control}
-              defaultValue="Active"
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="radio"
-                  value="Non-Active"
-                  className="hidden peer"
-                />
-              )}
-            />
-            <span className="text-gray-900 peer-checked:text-primary">
-              Non-Active
-            </span>
-          </label>
+            <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-orange-600">
+              <Controller
+                name="status"
+                control={control}
+                defaultValue="Active"
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="radio"
+                    value="Non-Active"
+                    className="hidden peer"
+                  />
+                )}
+              />
+              <span className="text-gray-900 peer-checked:text-primary peer-checked:bg-[#FAE8EF] w-full h-full flex items-center justify-center">
+                Non-Active
+              </span>
+            </label>
+          </div>
         </div>
-      </div>
 
         <div className="flex gap-2">
           <button

@@ -3,10 +3,12 @@ import Loading from "../../common/Loading";
 import Empty from "../../common/Empty";
 
 const DynamicTable = ({ columns, data, className = "", loading, tableRef }) => {
+  console.log(data,'lslslsl');
+  
   const isEmpty = data.length === 0;
 
   return (
-    <div className="relative  w-full h-full border overflow-auto scroll-1">
+    <div className="relative  w-full h-full min-h-[350px] border overflow-auto scroll-1">
       {loading ? (
         <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 ">
           <Loading />

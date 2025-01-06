@@ -57,3 +57,15 @@ export async function getSaltMoleculeById(id) {
       return { success: false, message: err.message || "An error occurred" };  
     }
   }
+
+  export async function getMedicines(params) {
+    try {
+      const response = await Api.get("healthsy-services/medicines", {
+        params,
+      });
+  
+      return response.data;
+    } catch (err) {
+      console.log(err);
+    }
+  }

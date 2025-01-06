@@ -8,18 +8,22 @@ import {
   Trash,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { deleteSalt, getSaltMolecule } from "../../../api/HealthSyServicesApi";
+import {
+  deleteSalt,
+  getMedicines,
+  getSaltMolecule,
+} from "../../../api/HealthSyServicesApi";
 import toast from "react-hot-toast";
 import DynamicTable from "../../ui/Table";
 import { useMastersContext } from "../../../context/MastersContext";
 import DeleteModal from "../../../common/DeleteModal";
 import Pagination from "../../../common/Pagination";
 import FilterData from "../../../common/FilterData";
-import test from "../../../assets/svg/par.svg";
 import { DotsSVG } from "../../ui/Dots";
 import ViewDetails from "./ViewDetails";
 import sortsvg from "../../../assets/svg/sort.svg";
 import add from "../../../assets/svg/add.svg";
+import threedots from "../../../assets/svg/threedots.svg";
 
 import downloadsvg from "../../../assets/svg/download.svg";
 
@@ -37,7 +41,7 @@ function Index() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState();
   const [searchText, setSearchText] = useState("");
-  const [salts, setSalts] = useState([]);
+  const [medicines, setMedicines] = useState([]);
   const [selectedLetter, setSelectedLetter] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [DeleteId, setDeleteId] = useState(null);
@@ -53,22 +57,22 @@ function Index() {
   };
   const applySort = () => {
     setIsDropdownOpen(false);
-    fetchSalts();
+    fetchMedicines();
   };
   const applyfilter = () => {
     setIsFilterOpen(false);
-    fetchSalts();
+    fetchMedicines();
   };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    fetchSalts(page);
+    fetchMedicines(page);
   };
 
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(Number(e.target.value));
     setCurrentPage(1);
-    fetchSalts(1, Number(e.target.value));
+    fetchMedicines(1, Number(e.target.value));
   };
 
   const handleSearch = (e) => {
@@ -87,7 +91,7 @@ function Index() {
     setIsOpenConfirmaion(true);
   };
 
-  const fetchSalts = async (
+  const fetchMedicines = async (
     page = currentPage,
     limit = itemsPerPage,
     search = searchText,
@@ -99,15 +103,16 @@ function Index() {
         page,
         limit,
         search,
-        sort: sort === "Newest" ? "desc" : "asc",
+        sort,
+        filterData,
       };
-      const res = await getSaltMolecule(params);
-      setSalts(res.data || []);
+      const res = await getMedicines(params);
+      setMedicines(res.medicines || []);
       setTotalItems(res.meta.total);
       setCurrentPage(res.meta.currentPage);
     } catch (error) {
       console.error("Error fetching salt molecules:", error.message);
-      setSalts([]);
+      setMedicines([]);
       setTotalItems(0);
     } finally {
       setLoading(false);
@@ -131,7 +136,7 @@ function Index() {
       try {
         await deleteSalt(DeleteId);
         toast.success("Role removed successfully");
-        fetchSalts(1, itemsPerPage, searchText, selectedSort, selectedLetter);
+        fetchMedicines(1, itemsPerPage, searchText, selectedSort);
       } catch (error) {
         console.error("Error removing role:", error);
         toast.error("Failed to remove role");
@@ -145,11 +150,11 @@ function Index() {
   useEffect(() => {
     setAddAction("");
     setCurrentPage(1);
-    fetchSalts(1, itemsPerPage, searchText, selectedSort, selectedLetter);
+    fetchMedicines(1, itemsPerPage, searchText, selectedSort, selectedLetter);
     return () => {
-      setSalts([]);
+      setMedicines([]);
     };
-  }, [itemsPerPage, searchText, selectedSort, selectedLetter]);
+  }, [itemsPerPage, searchText, selectedLetter, filterData]);
 
   const columns = [
     {
@@ -163,14 +168,14 @@ function Index() {
       render: (_, user) => (
         <div className="flex gap-4">
           <div
-            className={`w-[40%] flex items-center space-x-2 rounded-md p-1 ${
-              user.status
+            className={`w-[42%] flex items-center space-x-2 rounded-md p-1 ${
+              user.status=="Active"
                 ? "text-[#158844] bg-[#E8F7EE]"
                 : "text-[#C1A53F] bg-[#FCF5DC]"
             }`}
           >
             <DotsSVG active={user.status} />
-            <span className="">{user.status ? "Active" : "Inactive"}</span>
+            <span className="">{user.status==="Active" ? "Active" : "InActive"}</span>
           </div>
 
           <div className="relative">
@@ -178,26 +183,7 @@ function Index() {
               onClick={() => ActionDropdown(user._id)}
               className="cursor-pointer focus:outline-none"
             >
-              <svg
-                width="14"
-                height="4"
-                viewBox="0 0 14 4"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M13.4874 0.512567C12.804 -0.170848 11.696 -0.170848 11.0126 0.512567C10.3291 1.19598 10.3291 2.30402 11.0126 2.98744C11.696 3.67085 12.804 3.67085 13.4874 2.98744C14.1709 2.30405 14.1709 1.19601 13.4874 0.512567Z"
-                  fill="#4D4D4D"
-                />
-                <path
-                  d="M8.23744 0.512567C7.55402 -0.170848 6.44598 -0.170848 5.76257 0.512567C5.07915 1.19598 5.07915 2.30402 5.76257 2.98744C6.44598 3.67085 7.55402 3.67085 8.23744 2.98744C8.92085 2.30405 8.92085 1.19601 8.23744 0.512567Z"
-                  fill="#4D4D4D"
-                />
-                <path
-                  d="M2.98744 0.512567C2.30402 -0.170848 1.19598 -0.170848 0.512564 0.512567C-0.170852 1.19598 -0.170852 2.30402 0.512564 2.98744C1.19598 3.67085 2.30402 3.67085 2.98744 2.98744C3.67085 2.30405 3.67085 1.19601 2.98744 0.512567Z"
-                  fill="#4D4D4D"
-                />
-              </svg>
+              <img src={threedots} alt="" />
             </button>
             {ActionUser === user._id && (
               <div className="absolute left-0 mt-2 bg-white shadow-md rounded-md w-32 z-10">
@@ -261,19 +247,33 @@ function Index() {
       ),
     },
     {
-      key: "name",
+      key: "images.0.url",
       header: "Image",
       render: (_, user) => (
-        <span className="text-md  font-bold font-Mulish  cursor-pointer">
-          {/* {user.name || "N/A"} */}
-          <img src={test} className="w-12 h-12" alt="" />
+        <span className="text-md font-bold font-Mulish cursor-pointer">
+          {user.images && user.images[0]?.url ? (
+            <img
+              src={user.images[0].url}
+              className="w-12 h-12 object-cover"
+              alt={user.name || "Image"}
+            />
+          ) : (
+            "N/A"
+          )}
         </span>
       ),
     },
-
-    { key: "therapeutic_classification", header: "Type" },
-    { key: "therapeutic_classification", header: "Manufacturer Name" },
-    { key: "therapeutic_classification", header: "MRP" },
+    { key: "type", header: "Type" },
+    {
+      key: "manufacturer.name",
+      header: "Manufacturer Name",
+      render: (_, user) => <span>{user.manufacturer?.name || "N/A"}</span>,
+    },
+    {
+      key: "pricing.mrp",
+      header: "MRP",
+      render: (_, user) => <span>{user.pricing?.mrp || "N/A"}</span>,
+    },
   ];
 
   return (
@@ -316,8 +316,8 @@ function Index() {
               <img src={sortsvg} alt="" />
             </button>
             {isDropdownOpen && (
-              <div className="absolute top-full left-0 z-10 w-full sm:w-40 mt-2 bg-white border border-gray-300 rounded-md shadow-md">
-                <ul className="py-1">
+              <div className="absolute top-full left-0  z-10 w-full sm:w-[198px] mt-2 bg-[#FFFFFF] border border-gray-300 rounded-xl shadow-md">
+                <ul className="p-2">
                   <li
                     className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
                       selectedSort === "Newest"
@@ -326,7 +326,17 @@ function Index() {
                     }`}
                     onClick={() => setSelectedSort("Newest")}
                   >
-                    Newest
+                    <label className="flex items-center w-full cursor-pointer">
+                      <input
+                        type="radio"
+                        name="sortOption"
+                        value="Newest"
+                        checked={selectedSort === "Newest"}
+                        onChange={() => setSelectedSort("Newest")}
+                        className="mr-2 w-4 h-4 accent-[#CB1B5B]"
+                      />
+                      Newest First
+                    </label>
                   </li>
                   <li
                     className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
@@ -336,9 +346,100 @@ function Index() {
                     }`}
                     onClick={() => setSelectedSort("Oldest")}
                   >
-                    Oldest
+                    <label className="flex items-center w-full cursor-pointer">
+                      <input
+                        type="radio"
+                        name="sortOption"
+                        value="Oldest"
+                        checked={selectedSort === "Oldest"}
+                        onChange={() => setSelectedSort("Oldest")}
+                        className="mr-2 w-4 h-4 accent-[#CB1B5B]"
+                      />
+                      Oldest First
+                    </label>
+                  </li>
+                  <li
+                    className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
+                      selectedSort === "a-z"
+                        ? "text-[#CB1B5B] font-semibold"
+                        : ""
+                    }`}
+                    onClick={() => setSelectedSort("a-z")}
+                  >
+                    <label className="flex items-center w-full cursor-pointer">
+                      <input
+                        type="radio"
+                        name="sortOption"
+                        value="a-z"
+                        checked={selectedSort === "a-z"}
+                        onChange={() => setSelectedSort("a-z")}
+                        className="mr-2 w-4 h-4 accent-[#CB1B5B]"
+                      />
+                      Alphabetic A-Z
+                    </label>
+                  </li>
+                  <li
+                    className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
+                      selectedSort === "z-a"
+                        ? "text-[#CB1B5B] font-semibold"
+                        : ""
+                    }`}
+                    onClick={() => setSelectedSort("z-a")}
+                  >
+                    <label className="flex items-center w-full cursor-pointer">
+                      <input
+                        type="radio"
+                        name="sortOption"
+                        value="z-a"
+                        checked={selectedSort === "z-a"}
+                        onChange={() => setSelectedSort("z-a")}
+                        className="mr-2 w-4 h-4 accent-[#CB1B5B]"
+                      />
+                      Alphabetic Z-A
+                    </label>
+                  </li>
+                  <li
+                    className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
+                      selectedSort === "low-high"
+                        ? "text-[#CB1B5B] font-semibold"
+                        : ""
+                    }`}
+                    onClick={() => setSelectedSort("low-high")}
+                  >
+                    <label className="flex items-center w-full cursor-pointer">
+                      <input
+                        type="radio"
+                        name="sortOption"
+                        value="low-high"
+                        checked={selectedSort === "low-high"}
+                        onChange={() => setSelectedSort("low-high")}
+                        className="mr-2 w-4 h-4 accent-[#CB1B5B]"
+                      />
+                      MRP: Low to High
+                    </label>
+                  </li>
+                  <li
+                    className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
+                      selectedSort === "high-low"
+                        ? "text-[#CB1B5B] font-semibold"
+                        : ""
+                    }`}
+                    onClick={() => setSelectedSort("high-low")}
+                  >
+                    <label className="flex items-center w-full cursor-pointer">
+                      <input
+                        type="radio"
+                        name="sortOption"
+                        value="high-low"
+                        checked={selectedSort === "high-low"}
+                        onChange={() => setSelectedSort("high-low")}
+                        className="mr-2 w-4 h-4 accent-[#CB1B5B]"
+                      />
+                      MRP: High to Low
+                    </label>
                   </li>
                 </ul>
+
                 <button
                   className="w-full px-3 py-2 text-sm border-t border-gray-300 hover:bg-gray-50 text-[#CB1B5B] font-semibold rounded-b"
                   onClick={applySort}
@@ -365,10 +466,11 @@ function Index() {
             <span className="block text-[#333333] font-Mulish">Download</span>
             <img src={downloadsvg} alt="" />
           </button>
+
           <button
             onClick={createNewMedicine}
             type="button"
-            className="flex h-10 w-full sm:w-[172px] items-center justify-center border rounded-lg border-btn_bg bg-btn_bg text-[13px] transition-all duration-300 hover:bg-btn_bg"
+            className="sm:absolute sm:top-28 sm:right-7 sm:z-[9999] flex h-10 w-full sm:w-[172px] items-center justify-center border rounded-lg border-btn_bg bg-btn_bg text-[13px] transition-all duration-300 hover:bg-btn_bg"
           >
             <img src={add} alt="" />
             <span className="pl-2 font-Mulish text-white transition-all duration-300 group-hover:text-transparent">
@@ -381,14 +483,14 @@ function Index() {
       <DynamicTable
         tableRef={tableRef}
         columns={columns}
-        data={salts}
+        data={medicines}
         loading={loading}
       />
       <div className="w-full p-3 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex-shrink-0 px-6 py-2 border font-Mulish border-primary rounded-lg">
-          <h1>Total Medicines: 100</h1>
+        <div className="flex-shrink-0 px-4 py-2 border font-Mulish border-primary rounded-lg">
+          <h1>Total Medicines: {totalItems}</h1>
         </div>
-        <div className="w-full sm:w-auto mt-4 sm:mt-0 px-3">
+        <div className="w-auto mt-1 sm:mt-0 px-3 flex justify-end">
           <Pagination
             currentPage={currentPage}
             itemsPerPage={itemsPerPage}

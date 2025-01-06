@@ -1,5 +1,7 @@
 import { Search, X } from "lucide-react";
 import React, { useState, useEffect } from "react";
+import close from "../assets/svg/close.svg";
+import filterIcon from "../assets/svg/filter.svg";
 
 function FilterData({
   filterDropdown,
@@ -33,13 +35,9 @@ function FilterData({
         Manufacturer: ["Pfizer", "Johnson & Johnson", "Roche", "Novartis"],
         Salt: ["Acetaminophen", "Ibuprofen", "Aspirin", "Amoxicillin"],
         "Medicine Type": ["Tablet", "Capsule", "Syrup", "Injection"],
-        Variant: ["10mg", "20mg", "30mg", "50mg"],
-        "Prescription Type": [
-          "OTC",
-          "Prescription Only",
-          "Controlled Substance",
-        ],
-        Status: ["In Stock", "Out of Stock", "Discontinued"],
+        Variant: ["Variant", "Non-Variant "],
+        "Prescription Type": ["Rx", "Non-Rx "],
+        Status: ["Active", "In-Active"],
       };
       setAvailableOptions(mockData[selectedCategory] || []);
     };
@@ -58,14 +56,32 @@ function FilterData({
 
   const handleOptionClick = (option) => {
     setAppliedFilters((prevFilters) => {
-      const existingFilterIndex = prevFilters.findIndex(
-        (filter) =>
-          filter.category === selectedCategory && filter.value === option
-      );
-      if (existingFilterIndex > -1) {
-        return prevFilters.filter((_, index) => index !== existingFilterIndex);
+      if (
+        ["Variant", "Prescription Type", "Status"].includes(selectedCategory)
+      ) {
+        const filteredPrevFilters = prevFilters.filter(
+          (filter) => filter.category !== selectedCategory
+        );
+  
+        return [
+          ...filteredPrevFilters,
+          { category: selectedCategory, value: option },
+        ];
       } else {
-        return [...prevFilters, { category: selectedCategory, value: option }];
+        const existingFilterIndex = prevFilters.findIndex(
+          (filter) =>
+            filter.category === selectedCategory && filter.value === option
+        );
+        if (existingFilterIndex > -1) {
+          return prevFilters.filter(
+            (_, index) => index !== existingFilterIndex
+          );
+        } else {
+          return [
+            ...prevFilters,
+            { category: selectedCategory, value: option },
+          ];
+        }
       }
     });
   };
@@ -88,6 +104,7 @@ function FilterData({
 
   const handleApply = () => {
     console.log("Applied filters:", appliedFilters);
+    setFilterData(appliedFilters);
     toggleModal();
   };
 
@@ -104,59 +121,23 @@ function FilterData({
   return (
     <div className="relative w-full ml-2 ">
       <button
-        className="w-full sm:w-auto flex items-center justify-between px-4 py-2 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#CB1B5B]"
+        className="w-full sm:w-auto flex items-center justify-between px-5 py-2 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#CB1B5B]"
         onClick={toggleModal}
       >
-        <span>Filter </span>
-        <svg
-          width="18"
-          height="14"
-          viewBox="0 0 18 14"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="ml-2"
-        >
-          <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M11.9824 0.757568C10.4779 0.757568 9.2127 1.83595 8.9209 3.25757H0.732422C0.387247 3.25757 0.107422 3.53739 0.107422 3.88257C0.107422 4.22774 0.387247 4.50757 0.732422 4.50757H8.9209C9.2127 5.92919 10.4779 7.00757 11.9824 7.00757C13.4869 7.00757 14.7521 5.92919 15.0439 4.50757H16.9824C17.3276 4.50757 17.6074 4.22774 17.6074 3.88257C17.6074 3.53739 17.3276 3.25757 16.9824 3.25757H15.0439C14.7521 1.83595 13.4869 0.757568 11.9824 0.757568ZM11.9824 2.00757C13.0253 2.00757 13.8574 2.83965 13.8574 3.88257C13.8574 4.92549 13.0253 5.75757 11.9824 5.75757C10.9395 5.75757 10.1074 4.92549 10.1074 3.88257C10.1074 2.83965 10.9395 2.00757 11.9824 2.00757Z"
-            fill="#4D4D4D"
-          />
-          <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M5.73242 7.00757C4.22793 7.00757 2.9627 8.08595 2.6709 9.50757H0.732422C0.387247 9.50757 0.107422 9.78739 0.107422 10.1326C0.107422 10.4777 0.387247 10.7576 0.732422 10.7576H2.6709C2.9627 12.1792 4.22793 13.2576 5.73242 13.2576C7.23692 13.2576 8.50214 12.1792 8.79395 10.7576H16.9824C17.3276 10.7576 17.6074 10.4777 17.6074 10.1326C17.6074 9.78739 17.3276 9.50757 16.9824 9.50757H8.79395C8.50214 8.08595 7.23692 7.00757 5.73242 7.00757ZM5.73242 8.25757C6.77534 8.25757 7.60742 9.08965 7.60742 10.1326C7.60742 11.1755 6.77534 12.0076 5.73242 12.0076C4.6895 12.0076 3.85742 11.1755 3.85742 10.1326C3.85742 9.08965 4.6895 8.25757 5.73242 8.25757Z"
-            fill="#4D4D4D"
-          />
-        </svg>
+        <span className="mr-2 font-Mulish text-[#4D4D4D]">Filter</span>
+        <img src={filterIcon} alt="Filter Icon" className="mr-2" />
+        <div className="w-5 h-5 rounded-full bg-[#CB1B5B] text-[#FFFFFF] flex items-center justify-center text-xs font-medium">
+          {filterData.length}
+        </div>
       </button>
+
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-10 p-4">
-        <div className="w-full max-w-4xl bg-white rounded-md shadow-lg relative max-h-[90vh] overflow-hidden flex flex-col">
-          <div className="w-full flex justify-between items-center border-b-2 p-4">
-            <h3 className="text-lg font-bold">Filters</h3>
-            <button onClick={toggleModal}>
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M21 12C21 7.03125 16.9688 3 12 3C7.03125 3 3 7.03125 3 12C3 16.9688 7.03125 21 12 21C16.9688 21 21 16.9688 21 12Z"
-                    stroke="#4D4D4D"
-                    stroke-width="1.5"
-                    stroke-miterlimit="10"
-                  />
-                  <path
-                    d="M15 15L9 9M9 15L15 9"
-                    stroke="#4D4D4D"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
+          <div className="w-full max-w-4xl bg-white rounded-md shadow-lg relative max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="w-full flex justify-between items-center border-b-2 p-4">
+              <h3 className="text-lg font-bold">Filters</h3>
+              <button onClick={toggleModal}>
+                <img src={close} alt="" />
               </button>
             </div>
 
@@ -199,14 +180,33 @@ function FilterData({
                       <div className="relative flex items-center justify-center font-poppins">
                         <input
                           id={`option-${index}`}
-                          type="checkbox"
+                          type={
+                            ["Variant", "Prescription Type", "Status"].includes(
+                              selectedCategory
+                            )
+                              ? "radio"
+                              : "checkbox"
+                          }
+                          name={
+                            ["Variant", "Prescription Type", "Status"].includes(
+                              selectedCategory
+                            )
+                              ? "radioGroup"
+                              : undefined
+                          }
                           checked={appliedFilters.some(
                             (filter) =>
                               filter.category === selectedCategory &&
                               filter.value === option
                           )}
                           onChange={() => handleOptionClick(option)}
-                          className="peer h-4 w-4 appearance-none border border-gray-300 rounded bg-white checked:bg-primary checked:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                          className={`peer h-4 w-4 appearance-none border border-gray-300 rounded ${
+                            ["Variant", "Prescription Type", "Status"].includes(
+                              selectedCategory
+                            )
+                              ? "rounded-full"
+                              : "rounded"
+                          } bg-white checked:bg-primary checked:border-primary focus:outline-none focus:ring-1 focus:ring-primary`}
                         />
                         <svg
                           className="absolute w-4 h-4 pointer-events-none hidden peer-checked:block stroke-white left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
@@ -218,7 +218,32 @@ function FilterData({
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         >
-                          <polyline points="20 6 9 17 4 12"></polyline>
+                          <circle
+                            cx="12"
+                            cy="12"
+                            r="6"
+                            className={
+                              [
+                                "Variant",
+                                "Prescription Type",
+                                "Status",
+                              ].includes(selectedCategory)
+                                ? ""
+                                : "hidden"
+                            }
+                          />
+                          <polyline
+                            points="20 6 9 17 4 12"
+                            className={
+                              [
+                                "Variant",
+                                "Prescription Type",
+                                "Status",
+                              ].includes(selectedCategory)
+                                ? "hidden"
+                                : ""
+                            }
+                          />
                         </svg>
                       </div>
 
@@ -249,17 +274,38 @@ function FilterData({
                   </button>
                 </div>
                 <div className="space-y-2">
-                  {appliedFilters.map((filter, index) => (
+                  {Object.entries(
+                    appliedFilters.reduce((acc, filter) => {
+                      if (!acc[filter.category]) {
+                        acc[filter.category] = [];
+                      }
+                      acc[filter.category].push(filter.value);
+                      return acc;
+                    }, {})
+                  ).map(([category, values]) => (
                     <div
-                      key={index}
-                      className="flex items-center justify-between bg-[#FAE8EF] p-2 rounded-lg"
+                      key={category}
+                      className="flex flex-col justify-between p-1 rounded-lg"
                     >
-                      <span className="text-sm">
-                        {filter.category}: {filter.value}
-                      </span>
-                      <button onClick={() => handleRemoveFilter(filter)}>
-                        <X className="w-4 h-4 text-[#CB1B5B]" />
-                      </button>
+                      <h3>{category}</h3>
+                      <div className="flex flex-wrap w-full items-center gap-2">
+                        {values.map((value) => (
+                          <span
+                            key={value}
+                            className="text-sm p-2 w-fit rounded-lg bg-[#FAE8EF] flex items-center gap-2"
+                          >
+                            {value}
+                            <button
+                              onClick={() =>
+                                handleRemoveFilter({ category, value })
+                              }
+                              className="p-1 flex items-center justify-center"
+                            >
+                              <X className="w-4 h-4 text-[#CB1B5B]" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>

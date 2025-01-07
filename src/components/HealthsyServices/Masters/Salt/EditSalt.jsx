@@ -35,7 +35,7 @@ function EditSalt() {
             "therapeutic_classification",
             res.data.therapeutic_classification
           );
-          setValue("status", res.data.status);
+          setValue("status", res.data.status ? "Active" : "Non-Active");
         } else {
           toast.error("Failed to fetch salt molecule data");
         }
@@ -132,17 +132,19 @@ function EditSalt() {
               Status <MandatoryField />
             </label>
             <div className="flex space-x-4">
-              <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-[#FAE8EF]">
+              <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer">
                 <Controller
                   name="status"
                   control={control}
-                  defaultValue={saltData?.status ? "Active" : "Non-Active"}
+                  rules={{ required: "You must select a status" }}
                   render={({ field }) => (
                     <input
                       {...field}
                       type="radio"
                       value="Active"
                       className="hidden peer"
+                      checked={field.value === "Active"}
+                      onChange={() => field.onChange("Active")}
                     />
                   )}
                 />
@@ -151,17 +153,19 @@ function EditSalt() {
                 </span>
               </label>
 
-              <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-orange-600">
+              <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer">
                 <Controller
                   name="status"
                   control={control}
-                  defaultValue={saltData?.status ? "Active" : "Non-Active"}
+                  rules={{ required: "You must select a status" }}
                   render={({ field }) => (
                     <input
                       {...field}
                       type="radio"
                       value="Non-Active"
                       className="hidden peer"
+                      checked={field.value === "Non-Active"}
+                      onChange={() => field.onChange("Non-Active")}
                     />
                   )}
                 />
@@ -170,6 +174,11 @@ function EditSalt() {
                 </span>
               </label>
             </div>
+            {errors.status && (
+              <p className="text-red-500 text-sm mt-2">
+                {errors.status.message}
+              </p>
+            )}
           </div>
 
           <div className="flex gap-2">

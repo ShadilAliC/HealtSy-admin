@@ -1,16 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Search, ChevronDown, RefreshCw, Edit2, Trash } from "lucide-react";
+import {
+  Plus,
+  Search,
+  ChevronDown,
+  RefreshCw,
+  Edit2,
+  Trash,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { deleteSalt, getSaltMolecule, updateSaltMolecule } from "../../../../api/HealthSyServicesApi";
+import {
+  deleteManufacturer,
+  deleteSalt,
+  getManufacturer,
+  getSaltMolecule,
+  updateManufacturer,
+} from "../../../../api/HealthSyServicesApi";
 import DynamicTable from "../../../ui/Table";
 import Pagination from "../../../../common/Pagination";
 import DeleteModal from "../../../../common/DeleteModal";
 import toast from "react-hot-toast";
 
 import { useMastersContext } from "../../../../context/MastersContext";
-import AlphabetFilter from "../../../../common/AlphabetFilter";
 import { DotsSVG } from "../../../ui/Dots";
-function Salt() {
+function ManufacturerList() {
   const tableRef = useRef(null);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -22,11 +34,9 @@ function Salt() {
   const [totalItems, setTotalItems] = useState();
   const [ActionUser, setActionUser] = useState(null);
   const [searchText, setSearchText] = useState("");
-  const [salts, setSalts] = useState([]);
-  const [selectedLetter, setSelectedLetter] = useState("");
+  const [manufacturer, setManufacturer] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [DeleteId,setDeleteId]=useState(null)
-
+  const [DeleteId, setDeleteId] = useState(null);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -34,18 +44,18 @@ function Salt() {
 
   const applySort = () => {
     setIsDropdownOpen(false);
-    fetchSalts();
+    fetchManufacturer();
   };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    fetchSalts(page);
+    fetchManufacturer(page);
   };
 
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(Number(e.target.value));
     setCurrentPage(1);
-    fetchSalts(1, Number(e.target.value));
+    fetchManufacturer(1, Number(e.target.value));
   };
 
   const handleSearch = (e) => {
@@ -54,17 +64,25 @@ function Salt() {
   const ActionDropdown = (id) => {
     setActionUser((prev) => (prev === id ? null : id));
   };
-  const createSalt = () => {
-    setAddAction("Add Salt/Molecule");
-    navigate("salt-molecule/add-salt-molecule");
+  const createManufacturer = () => {
+    setAddAction("Add Manufacturer");
+    navigate("manufacturer/add-manufacturer");
+  };
+  const handleStatus = async (user) => {
+    const data = {
+      ...user,
+      status: !user.status,
+    };
+    await updateManufacturer(user._id, data);
+    setActionUser(null)
+    fetchManufacturer(1, itemsPerPage, searchText, selectedSort);
   };
 
-  const fetchSalts = async (
+  const fetchManufacturer = async (
     page = currentPage,
     limit = itemsPerPage,
     search = searchText,
-    sort = selectedSort,
-    letter = selectedLetter
+    sort = selectedSort
   ) => {
     try {
       setLoading(true);
@@ -73,47 +91,34 @@ function Salt() {
         limit,
         search,
         sort,
-        letter,
       };
-      const res = await getSaltMolecule(params);
-      setSalts(res.data || []);
+      const res = await getManufacturer(params);
+      setManufacturer(res.data || []);
       setTotalItems(res.meta.total);
       setCurrentPage(res.meta.currentPage);
     } catch (error) {
       console.error("Error fetching salt molecules:", error.message);
-      setSalts([]);
+      setManufacturer([]);
       setTotalItems(0);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLetterSelect = (letter) => {
-    setSelectedLetter(letter === selectedLetter ? "" : letter);
-  };
   const handleEdit = (id) => {
-    setAddAction("Edit Salt/Molecule");
-    navigate(`salt-molecule/edit-salt-molecule/${id}`);
+    setAddAction("Edit Manufacturer");
+    navigate(`manufacturer/edit-manufacturer/${id}`);
   };
-  const handleDelete=async(id)=>{
-    setDeleteId(id)
-    setIsDeleteModalOpen(true)
-  }
-    const handleStatus = async (user) => {
-      const data = {
-        ...user,
-        status: !user.status,
-      };
-      await updateSaltMolecule(data,user._id);
-      setActionUser(null)
-      fetchSalts(1, itemsPerPage, searchText, selectedSort, selectedLetter);
-    };
+  const handleDelete = async (id) => {
+    setDeleteId(id);
+    setIsDeleteModalOpen(true);
+  };
   const confirmDelete = async () => {
     if (DeleteId) {
       try {
-        await deleteSalt(DeleteId);
+        await deleteManufacturer(DeleteId);
         toast.success("Role removed successfully");
-        fetchSalts(1, itemsPerPage, searchText, selectedSort, selectedLetter);
+        fetchManufacturer(1, itemsPerPage, searchText, selectedSort);
       } catch (error) {
         console.error("Error removing role:", error);
         toast.error("Failed to remove role");
@@ -123,18 +128,14 @@ function Salt() {
       }
     }
   };
-  const RefreshTable = () => {
-    setSelectedLetter("");
-    fetchSalts(1, itemsPerPage, searchText, selectedSort, selectedLetter);
-  };
 
   useEffect(() => {
     setCurrentPage(1);
-    fetchSalts(1, itemsPerPage, searchText, selectedSort, selectedLetter);
+    fetchManufacturer(1, itemsPerPage, searchText, selectedSort);
     return () => {
-      setSalts([]);
+      setManufacturer([]);
     };
-  }, [itemsPerPage, searchText, selectedLetter]);
+  }, [itemsPerPage, searchText]);
 
   const columns = [
     {
@@ -148,7 +149,7 @@ function Salt() {
       render: (_, user) => (
         <div className="flex gap-4">
           <div
-            className={`w-[30%] flex items-center gap-1 rounded-md p-1 ${
+            className={`w-[40%] flex items-center gap-1 rounded-md p-1 ${
               user.status
                 ? "text-[#158844] bg-[#E8F7EE]"
                 : "text-[#C1A53F] bg-[#FCF5DC]"
@@ -233,16 +234,18 @@ function Salt() {
         </div>
       ),
     },
-    { key: "name", header: "Salt / Molecule Name" },
-    { key: "therapeutic_classification", header: "Therapeutic Classification" },
-  
+    { key: "name", header: "Manufacturer Name" },
+    {
+      key: "manufacturer_address",
+      header: "Address of the Manufacturer",
+    },
   ];
 
   return (
     <div className="w-full h-auto overflow-hidden">
-      <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 px-3 py-5 pb-5">
+      <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0  py-5 pb-5">
         <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
-          <div className="flex  gap-4">
+          <div className="flex  gap-2">
             <div className="relative w-full sm:w-32">
               <select
                 className="w-full flex items-center justify-between px-3 py-2 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#CB1B5B] appearance-none"
@@ -255,6 +258,18 @@ function Salt() {
                 <option value="100">Show: 100</option>
               </select>
               <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-gray-500 pointer-events-none" />
+            </div>
+            <div className="relative w-full sm:w-64">
+              <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                <Search className="text-gray-500 w-5 h-5" />
+              </span>
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded-md py-1.5 px-4 pl-10 pr-4 focus:outline-none focus:ring-1 focus:ring-[#CB1B5B] focus:border-transparent"
+                placeholder="Search..."
+                value={searchText}
+                onChange={handleSearch}
+              />
             </div>
 
             <div className="relative w-full sm:w-24">
@@ -278,128 +293,102 @@ function Salt() {
               </button>
               {isDropdownOpen && (
                 <div className="absolute top-full left-0  z-10 w-full sm:w-[198px] mt-2 bg-[#FFFFFF] border border-gray-300 rounded-xl shadow-md">
-                <ul className="p-2">
-                  <li
-                    className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
-                      selectedSort === "Newest"
-                        ? "text-[#CB1B5B] font-semibold"
-                        : ""
-                    }`}
-                    onClick={() => setSelectedSort("Newest")}
-                  >
-                    <label className="flex items-center w-full cursor-pointer">
-                      <input
-                        type="radio"
-                        name="sortOption"
-                        value="Newest"
-                        checked={selectedSort === "Newest"}
-                        onChange={() => setSelectedSort("Newest")}
-                        className="mr-2 w-4 h-4 accent-[#CB1B5B]"
-                      />
-                      Newest First
-                    </label>
-                  </li>
-                  <li
-                    className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
-                      selectedSort === "Oldest"
-                        ? "text-[#CB1B5B] font-semibold"
-                        : ""
-                    }`}
-                    onClick={() => setSelectedSort("Oldest")}
-                  >
-                    <label className="flex items-center w-full cursor-pointer">
-                      <input
-                        type="radio"
-                        name="sortOption"
-                        value="Oldest"
-                        checked={selectedSort === "Oldest"}
-                        onChange={() => setSelectedSort("Oldest")}
-                        className="mr-2 w-4 h-4 accent-[#CB1B5B]"
-                      />
-                      Oldest First
-                    </label>
-                  </li>
-                  <li
-                    className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
-                      selectedSort === "a-z"
-                        ? "text-[#CB1B5B] font-semibold"
-                        : ""
-                    }`}
-                    onClick={() => setSelectedSort("a-z")}
-                  >
-                    <label className="flex items-center w-full cursor-pointer">
-                      <input
-                        type="radio"
-                        name="sortOption"
-                        value="a-z"
-                        checked={selectedSort === "a-z"}
-                        onChange={() => setSelectedSort("a-z")}
-                        className="mr-2 w-4 h-4 accent-[#CB1B5B]"
-                      />
-                      Alphabetic A-Z
-                    </label>
-                  </li>
-                  <li
-                    className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
-                      selectedSort === "z-a"
-                        ? "text-[#CB1B5B] font-semibold"
-                        : ""
-                    }`}
-                    onClick={() => setSelectedSort("z-a")}
-                  >
-                    <label className="flex items-center w-full cursor-pointer">
-                      <input
-                        type="radio"
-                        name="sortOption"
-                        value="z-a"
-                        checked={selectedSort === "z-a"}
-                        onChange={() => setSelectedSort("z-a")}
-                        className="mr-2 w-4 h-4 accent-[#CB1B5B]"
-                      />
-                      Alphabetic Z-A
-                    </label>
-                  </li>
-                </ul>
+                  <ul className="p-2">
+                    <li
+                      className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
+                        selectedSort === "Newest"
+                          ? "text-[#CB1B5B] font-semibold"
+                          : ""
+                      }`}
+                      onClick={() => setSelectedSort("Newest")}
+                    >
+                      <label className="flex items-center w-full cursor-pointer">
+                        <input
+                          type="radio"
+                          name="sortOption"
+                          value="Newest"
+                          checked={selectedSort === "Newest"}
+                          onChange={() => setSelectedSort("Newest")}
+                          className="mr-2 w-4 h-4 accent-[#CB1B5B]"
+                        />
+                        Newest First
+                      </label>
+                    </li>
+                    <li
+                      className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
+                        selectedSort === "Oldest"
+                          ? "text-[#CB1B5B] font-semibold"
+                          : ""
+                      }`}
+                      onClick={() => setSelectedSort("Oldest")}
+                    >
+                      <label className="flex items-center w-full cursor-pointer">
+                        <input
+                          type="radio"
+                          name="sortOption"
+                          value="Oldest"
+                          checked={selectedSort === "Oldest"}
+                          onChange={() => setSelectedSort("Oldest")}
+                          className="mr-2 w-4 h-4 accent-[#CB1B5B]"
+                        />
+                        Oldest First
+                      </label>
+                    </li>
+                    <li
+                      className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
+                        selectedSort === "a-z"
+                          ? "text-[#CB1B5B] font-semibold"
+                          : ""
+                      }`}
+                      onClick={() => setSelectedSort("a-z")}
+                    >
+                      <label className="flex items-center w-full cursor-pointer">
+                        <input
+                          type="radio"
+                          name="sortOption"
+                          value="a-z"
+                          checked={selectedSort === "a-z"}
+                          onChange={() => setSelectedSort("a-z")}
+                          className="mr-2 w-4 h-4 accent-[#CB1B5B]"
+                        />
+                        Alphabetic A-Z
+                      </label>
+                    </li>
+                    <li
+                      className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
+                        selectedSort === "z-a"
+                          ? "text-[#CB1B5B] font-semibold"
+                          : ""
+                      }`}
+                      onClick={() => setSelectedSort("z-a")}
+                    >
+                      <label className="flex items-center w-full cursor-pointer">
+                        <input
+                          type="radio"
+                          name="sortOption"
+                          value="z-a"
+                          checked={selectedSort === "z-a"}
+                          onChange={() => setSelectedSort("z-a")}
+                          className="mr-2 w-4 h-4 accent-[#CB1B5B]"
+                        />
+                        Alphabetic Z-A
+                      </label>
+                    </li>
+                  </ul>
 
-                <button
-                  className="w-full px-3 py-2 text-sm border-t border-gray-300 hover:bg-gray-50 text-[#CB1B5B] font-semibold rounded-b"
-                  onClick={applySort}
-                >
-                  Apply
-                </button>
-              </div>
+                  <button
+                    className="w-full px-3 py-2 text-sm border-t border-gray-300 hover:bg-gray-50 text-[#CB1B5B] font-semibold rounded-b"
+                    onClick={applySort}
+                  >
+                    Apply
+                  </button>
+                </div>
               )}
             </div>
           </div>
-
-          <div className="relative w-full sm:w-64">
-            <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <Search className="text-gray-500 w-5 h-5" />
-            </span>
-            <input
-              type="text"
-              className="w-full border border-gray-300 rounded-md py-2 px-4 pl-10 pr-4 focus:outline-none focus:ring-1 focus:ring-[#CB1B5B] focus:border-transparent"
-              placeholder="Search..."
-              value={searchText}
-              onChange={handleSearch}
-            />
-          </div>
-
-          <div className="relative group">
-            <button
-              onClick={RefreshTable}
-              className="flex items-center justify-center p-2 rounded bg-gray-100 hover:bg-gray-200"
-              aria-label="Refresh table"
-            >
-              <RefreshCw className="w-4 text-primary" />
-            </button>
-            <span className="absolute top-1/2 left-full transform -translate-y-1/2 ml-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-              Refresh table
-            </span>
-          </div>
         </div>
         <button
-          onClick={createSalt}
+          onClick={createManufacturer}
           type="button"
           className="sm:absolute sm:top-28 sm:right-7 z-[9999] flex h-10 w-full sm:w-[172px] items-center justify-center border rounded-lg border-btn_bg bg-btn_bg text-[13px] transition-all duration-300 hover:bg-btn_bg"
         >
@@ -417,20 +406,15 @@ function Salt() {
             />
           </svg>
           <span className="pl-2 font-Mulish text-white transition-all duration-300 group-hover:text-transparent">
-          Add Salt / Molecule
+            Add Manufacturer
           </span>
         </button>
       </div>
 
-      <AlphabetFilter
-        onLetterSelect={handleLetterSelect}
-        selectedLetter={selectedLetter}
-      />
-
       <DynamicTable
         tableRef={tableRef}
         columns={columns}
-        data={salts}
+        data={manufacturer}
         loading={loading}
       />
 
@@ -452,4 +436,4 @@ function Salt() {
   );
 }
 
-export default Salt;
+export default ManufacturerList;

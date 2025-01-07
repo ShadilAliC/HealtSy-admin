@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { useMastersContext } from "../../context/MastersContext";
-import ManufacturerList from "../../components/HealthsyServices/Masters/ManufacturerList ";
 import Salt from "../../components/HealthsyServices/Masters/Salt/Salt";
-import Unit from "../../components/HealthsyServices/Masters/Unit";
-import ProductType from "../../components/HealthsyServices/Masters/ProductType ";
+import Unit from "../../components/HealthsyServices/Masters/Unit/Unit";
+import ManufacturerList from "../../components/HealthsyServices/Masters/Manufacture/ManufacturerList ";
+import ProductType from "../../components/HealthsyServices/Masters/ProductType/ProductType";
 
 
 function Masters() {

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { CheckIcon, XIcon } from "lucide-react";
+import { XIcon } from "lucide-react";
 
 const ConfirmationModal = ({ onClose }) => {
   const [email, setEmail] = useState("");

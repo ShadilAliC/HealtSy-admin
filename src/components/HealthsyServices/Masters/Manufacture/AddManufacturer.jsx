@@ -1,14 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import MandatoryField from "../../../../common/MandatoryField";
 import { useNavigate } from "react-router-dom";
 import { useMastersContext } from "../../../../context/MastersContext";
-import { createSaltMolecule } from "../../../../api/HealthSyServicesApi";
+import { createManufacturer } from "../../../../api/HealthSyServicesApi";
 import toast, { Toaster } from "react-hot-toast";
-import Swal from "sweetalert2";
+import Success from "../../../../common/Success";
 
-function AddSalt() {
+function AddManufacturer() {
   const { setAddAction, setSelectedTab } = useMastersContext();
+  const [isOpenSuccess, setIsOpenSuccess] = useState(false);
+  const [message, setMessage] = useState("");
 
   const navigate = useNavigate();
   useEffect(() => {});
@@ -21,49 +23,43 @@ function AddSalt() {
 
   const onSubmit = async (data) => {
     try {
-      if (data.status === "Active") {
-        data.status = true;
+      data.status = data.status === "Active";
+      const res = await createManufacturer(data);
+      if (res?.success) {
+        setIsOpenSuccess(true);
+        setMessage("New Manufacturer Added Successfully");
+        setTimeout(() => {
+          setIsOpenSuccess(false);
+          setSelectedTab("manufacturer");
+          navigate("/healthsy-services/order-medicines/masters");
+        }, 2000);
       } else {
-        data.status = false;
-      }
-
-      const res = await createSaltMolecule(data);
-      if (res.success) {
-        Swal.fire({
-          icon: "success",
-          title: "New Molecule Added Successfully",
-          customClass: {
-            icon: "custom-success-icon",
-          },
-        });
-        toast.success(res.message);
-        setSelectedTab("salt");
-        navigate("/healthsy-services/order-medicines/masters");
+        toast.error(res.message || "Failed to add manufacturer.");
       }
     } catch (err) {
-      toast.error(err.message);
+      toast.error(err?.message || "An error occurred.");
     }
   };
+
   const onclose = () => {
-    setSelectedTab("salt");
+    setSelectedTab("manufacturer");
     setAddAction("");
     navigate("/healthsy-services/order-medicines/masters");
   };
 
   return (
     <div className="p-4 sm:p-6 md:p-8 w-full -auto">
-      <h2 className="text-2xl font-Mulish font-semibold mb-6">
-        Add Salt Molecule
-      </h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6  ">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <label htmlFor="name" className="block font-medium">
-              Molecule Name <MandatoryField />
+              Manufacturer Name <MandatoryField />
             </label>
             <input
               id="name"
-              {...register("name", { required: "Molecule Name is required" })}
+              {...register("name", {
+                required: "Manufacturer Name is required",
+              })}
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary"
             />
             {errors.name && (
@@ -74,26 +70,59 @@ function AddSalt() {
           </div>
 
           <div className="space-y-2">
-            <label
-              htmlFor="therapeutic_classification"
-              className="block font-medium"
-            >
-              Therapeutic Classification <MandatoryField />
+            <label htmlFor="manufacturer_address" className="block font-medium">
+              Manufacturer Address <MandatoryField />
             </label>
             <input
-              id="therapeutic_classification"
-              {...register("therapeutic_classification", {
-                required: "Therapeutic Classification is required",
+              id="manufacturer_address"
+              {...register("manufacturer_address", {
+                required: "Manufacturer Address is required",
               })}
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary"
             />
-            {errors.therapeutic_classification && (
+            {errors.manufacturer_address && (
               <span className="text-red-500 text-sm">
-                {errors.therapeutic_classification.message}
+                {errors.manufacturer_address.message}
+              </span>
+            )}
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="customer_email" className="block font-medium">
+              Customer Email <MandatoryField />
+            </label>
+            <input
+              type="email"
+              id="customer_email"
+              {...register("customer_email", {
+                required: "Customer Email is required",
+              })}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+            {errors.customer_email && (
+              <span className="text-red-500 text-sm">
+                {errors.customer_email.message}
+              </span>
+            )}
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="country_origin" className="block font-medium">
+              Country of Origin <MandatoryField />
+            </label>
+            <input
+              id="country_origin"
+              {...register("country_origin", {
+                required: "Country of Origin is required",
+              })}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+            {errors.country_origin && (
+              <span className="text-red-500 text-sm">
+                {errors.country_origin.message}
               </span>
             )}
           </div>
         </div>
+
         <div>
           <label className="block mb-2 text-[14px] font-Mulish text-[#4D4D4D]">
             Status <MandatoryField />
@@ -162,8 +191,9 @@ function AddSalt() {
         </div>
       </form>
       <Toaster />
+      {isOpenSuccess && <Success message={message} />}
     </div>
   );
 }
 
-export default AddSalt;
+export default AddManufacturer;

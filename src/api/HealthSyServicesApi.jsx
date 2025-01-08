@@ -63,16 +63,6 @@ export async function deleteSalt(id) {
   }
 }
 
-export async function getMedicines(params) {
-  try {
-    const response = await Api.get("healthsy-services/medicines", {
-      params,
-    });
-    return response.data;
-  } catch (err) {
-    console.log(err);
-  }
-}
 
 export async function createManufacturer(data) {
   try {
@@ -249,6 +239,39 @@ export async function updateProductType(id, data) {
 export async function deleteProductType(id) {
   try {
     const response = await Api.delete(`healthsy-services/product-type/${id}`);
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error("Failed to fetch data");
+    }
+  } catch (err) {
+    return { success: false, message: err.message || "An error occurred" };
+  }
+}
+
+export async function getMedicines(params) {
+  try {
+    const response = await Api.get("healthsy-services/medicines", {
+      params,
+    });
+    return response.data;
+  } catch (err) {
+    console.log(err);
+  }
+}
+export async function createMedicine(data) {
+  console.log(data,'aldld');
+  
+  try {
+    const response = await Api.post("healthsy-services/medicines",data);
+    return response.data;
+  } catch (err) {
+    console.log(err);
+  }
+}
+export async function getMedicineById(id) {
+  try {
+    const response = await Api.get(`healthsy-services/medicines/${id}`);
     if (response && response.data) {
       return response.data;
     } else {

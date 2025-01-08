@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useState } from "react";
 
 function UploadImagePreview({ images, setImages }) {
@@ -57,7 +55,7 @@ function UploadImagePreview({ images, setImages }) {
                 <>
                   <div className="relative w-full  h-full p-2">
                     <img
-                      src={URL.createObjectURL(images[index])}
+                      src={images[index]}
                       alt={`Uploaded ${index + 1}`}
                       className="w-full h-full object-contain rounded-md"
                     />

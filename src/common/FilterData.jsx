@@ -2,6 +2,11 @@ import { Search, X } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import close from "../assets/svg/close.svg";
 import filterIcon from "../assets/svg/filter.svg";
+import {
+  getManufacturer,
+  getProductType,
+  getSaltMolecule,
+} from "../api/HealthSyServicesApi";
 
 function FilterData({
   filterDropdown,
@@ -28,18 +33,28 @@ function FilterData({
     { name: "Prescription Type" },
     { name: "Status" },
   ];
-
   useEffect(() => {
     const fetchOptions = async () => {
-      const mockData = {
-        Manufacturer: ["Pfizer", "Johnson & Johnson", "Roche", "Novartis"],
-        Salt: ["Acetaminophen", "Ibuprofen", "Aspirin", "Amoxicillin"],
-        "Medicine Type": ["Tablet", "Capsule", "Syrup", "Injection"],
-        Variant: ["Variant", "Non-Variant "],
-        "Prescription Type": ["Rx", "Non-Rx "],
-        Status: ["Active", "In-Active"],
-      };
-      setAvailableOptions(mockData[selectedCategory] || []);
+      try {
+        const [saltMoleculeResponse, manufactureResponse, productTypeResponse] =
+          await Promise.all([
+            getSaltMolecule(),
+            getManufacturer(),
+            getProductType(),
+          ]);
+        const mockData = {
+          Manufacturer: manufactureResponse.data.map((item) => item.name),
+          Salt: saltMoleculeResponse.data.map((item) => item.name),
+          "Medicine Type": productTypeResponse.data.map((item) => item.name),
+          Variant: ["Variant", "Non-Variant"],
+          "Prescription Type": ["Rx", "Non-Rx"],
+          Status: ["Active", "In-Active"],
+        };
+
+        setAvailableOptions(mockData[selectedCategory] || []);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
     };
 
     fetchOptions();
@@ -62,7 +77,7 @@ function FilterData({
         const filteredPrevFilters = prevFilters.filter(
           (filter) => filter.category !== selectedCategory
         );
-  
+
         return [
           ...filteredPrevFilters,
           { category: selectedCategory, value: option },
@@ -114,9 +129,12 @@ function FilterData({
     setSelectedCategory("Manufacturer");
   };
 
-  const filteredOptions = availableOptions.filter((option) =>
-    option.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredOptions = availableOptions.filter((option) => {
+    if (typeof option === "string") {
+      return option.toLowerCase().includes(searchTerm.toLowerCase());
+    }
+    return false; // Ignore non-string options
+  });
 
   return (
     <div className="relative w-full ml-2 ">

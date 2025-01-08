@@ -3,12 +3,34 @@ import { useForm, Controller, useFieldArray } from "react-hook-form";
 import JoditEditor from "jodit-react";
 import MandatoryField from "../../../common/MandatoryField";
 import { Plus, Trash2 } from "lucide-react";
+import { useSelector } from "react-redux";
+import { createMedicine } from "../../../api/HealthSyServicesApi";
+import Success from "../../../common/Success";
+import { useNavigate } from "react-router-dom";
 
-export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
+export default function FAQ({ placeholder = "Type here", setSelectedTab }) {
   const editor = useRef(null);
-  const { control, handleSubmit } = useForm({
+  const navigate = useNavigate();
+
+  const medicineInfo = useSelector((state) => state.medicine.medicineInfo);
+  const [isOpenSuccess, setIsOpenSuccess] = useState(false);
+    const [message, setMessage] = useState("");
+  
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
-      faqs: [{ question: "", answer: "" }],
+      description: "",
+      author_details: "",
+      warning_and_precaution: "",
+      direction_and_uses: "",
+      side_effects: "",
+      storage_disposal: "",
+      dosage: "",
+      reference: "",
+      faqs: [],
     },
   });
   const { fields, append, remove } = useFieldArray({
@@ -24,12 +46,33 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
     [placeholder]
   );
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    try {
+      const mergedData = {
+        ...medicineInfo,
+        ...data,
+      };
+      const res = await createMedicine(mergedData);
+      if (res?.success) {
+        setIsOpenSuccess(true);
+        setMessage("New Medicine Added Successfully");
+        setTimeout(() => {
+          setIsOpenSuccess(false);
+          navigate("/healthsy-services/order-medicines/medicine-list");
+        }, 2000);
+      } else {
+        toast.error(res.message || "Failed to add ProductType.");
+      }
+      console.log(res);
+    } catch (err) {
+      console.error(err);
+      
+    }
   };
-  const handlePrevious=()=>{
-    setSelectedTab("medicine")
-  }
+
+  const handlePrevious = () => {
+    setSelectedTab("medicine");
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -43,7 +86,7 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
         <Controller
           name="description"
           control={control}
-          defaultValue=""
+          rules={{ required: "Description is required" }}
           render={({ field }) => (
             <JoditEditor
               ref={editor}
@@ -54,6 +97,11 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
             />
           )}
         />
+        {errors.description && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.description.message}
+          </p>
+        )}
       </div>
       <div>
         <label
@@ -65,7 +113,7 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
         <Controller
           name="author_details"
           control={control}
-          defaultValue=""
+          rules={{ required: "Author Details are required" }}
           render={({ field }) => (
             <JoditEditor
               ref={editor}
@@ -76,6 +124,11 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
             />
           )}
         />
+        {errors.author_details && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.author_details.message}
+          </p>
+        )}
       </div>
       <div>
         <label
@@ -87,7 +140,7 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
         <Controller
           name="warning_and_precaution"
           control={control}
-          defaultValue=""
+          rules={{ required: "Warning and precaution are required" }}
           render={({ field }) => (
             <JoditEditor
               ref={editor}
@@ -98,6 +151,11 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
             />
           )}
         />
+        {errors.warning_and_precaution && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.warning_and_precaution.message}
+          </p>
+        )}
       </div>
       <div>
         <label
@@ -109,7 +167,6 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
         <Controller
           name="direction_and_uses"
           control={control}
-          defaultValue=""
           render={({ field }) => (
             <JoditEditor
               ref={editor}
@@ -131,7 +188,7 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
         <Controller
           name="side_effects"
           control={control}
-          defaultValue=""
+          rules={{ required: "Side Effects are required" }}
           render={({ field }) => (
             <JoditEditor
               ref={editor}
@@ -142,6 +199,11 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
             />
           )}
         />
+        {errors.side_effects && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.side_effects.message}
+          </p>
+        )}
       </div>
       <div>
         <label
@@ -153,7 +215,7 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
         <Controller
           name="storage_disposal"
           control={control}
-          defaultValue=""
+          rules={{ required: "Storage & Disposal information is required" }}
           render={({ field }) => (
             <JoditEditor
               ref={editor}
@@ -164,6 +226,11 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
             />
           )}
         />
+        {errors.storage_disposal && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.storage_disposal.message}
+          </p>
+        )}
       </div>
       <div>
         <label
@@ -175,7 +242,7 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
         <Controller
           name="dosage"
           control={control}
-          defaultValue=""
+          rules={{ required: "Dosage information is required" }}
           render={({ field }) => (
             <JoditEditor
               ref={editor}
@@ -186,6 +253,9 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
             />
           )}
         />
+        {errors.dosage && (
+          <p className="text-red-500 text-sm mt-1">{errors.dosage.message}</p>
+        )}
       </div>
       <div>
         <label
@@ -197,7 +267,7 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
         <Controller
           name="reference"
           control={control}
-          defaultValue=""
+          rules={{ required: "Reference is required" }}
           render={({ field }) => (
             <JoditEditor
               ref={editor}
@@ -208,9 +278,13 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
             />
           )}
         />
+        {errors.reference && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.reference.message}
+          </p>
+        )}
       </div>
 
-      {/* FAQ Section */}
       <div className="space-y-4">
         {fields.map((field, index) => (
           <div
@@ -224,12 +298,24 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
               >
                 Question {index + 1} <MandatoryField />
               </label>
-              <input
-                type="text"
-                id={`faqs.${index}.question`}
-                className="w-full p-3 border border-transparent focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-lg text-gray-800 bg-gray-100 placeholder-gray-500 focus:outline-none"
-                placeholder="Enter medicine Question"
+              <Controller
+                name={`faqs.${index}.question`}
+                control={control}
+                rules={{ required: "Question is required" }}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="text"
+                    className="w-full p-3 border border-transparent focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-lg text-gray-800 bg-gray-100 placeholder-gray-500 focus:outline-none"
+                    placeholder="Enter medicine Question"
+                  />
+                )}
               />
+              {errors.faqs?.[index]?.question && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.faqs[index].question.message}
+                </p>
+              )}
             </div>
             <div>
               <label
@@ -238,12 +324,24 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
               >
                 Answer <MandatoryField />
               </label>
-              <input
-                type="text"
-                id={`faqs.${index}.answer`}
-                className="w-full p-3 border border-transparent focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-lg text-gray-800 bg-gray-100 placeholder-gray-500 focus:outline-none"
-                placeholder="Enter package Answer"
+              <Controller
+                name={`faqs.${index}.answer`}
+                control={control}
+                rules={{ required: "Answer is required" }}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="text"
+                    className="w-full p-3 border border-transparent focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-lg text-gray-800 bg-gray-100 placeholder-gray-500 focus:outline-none"
+                    placeholder="Enter package Answer"
+                  />
+                )}
               />
+              {errors.faqs?.[index]?.answer && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.faqs[index].answer.message}
+                </p>
+              )}
             </div>
             {index >= 0 && (
               <div className="flex px-3 py-2 mt-7 justify-center items-center rounded-md bg-[#EB0000] ">
@@ -273,23 +371,22 @@ export default function FAQ({ placeholder = "Type here",setSelectedTab }) {
         </button>
       </div>
 
-
       <div className="w-full flex justify-end items-center gap-4 p-4">
-
-      <button
-      onClick={handlePrevious}
-        type="submit"
-        className="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-[#181423] bg-[#f5f3f3] hover:bg-[#E9E9E9focus:outline-none  "
-      >
-        Previous Page 
-      </button>
-      <button
-        type="submit"
-        className="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#1AAA55] hover:bg-[#1AAA55] focus:outline-none  "
-      >
-        Submit
-      </button>
+        <button
+          onClick={handlePrevious}
+          type="button"
+          className="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-[#181423] bg-[#f5f3f3] hover:bg-[#E9E9E9] focus:outline-none"
+        >
+          Previous Page
+        </button>
+        <button
+          type="submit"
+          className="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#1AAA55] hover:bg-[#1AAA55] focus:outline-none"
+        >
+          Submit
+        </button>
       </div>
+      {isOpenSuccess && <Success message={message} />}
     </form>
   );
 }

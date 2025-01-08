@@ -20,10 +20,10 @@
 // export { Store,persistor};
 
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import userReducer from "./Slices/UserSlice";
+import medicineReducer from "./Slices/MedicineSlice";
 
 const rootReducer = combineReducers({
-  user: userReducer,
+  medicine: medicineReducer,
 });
 
 const Store = configureStore({

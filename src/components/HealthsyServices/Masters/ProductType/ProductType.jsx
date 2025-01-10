@@ -144,7 +144,7 @@ function ProductType() {
       render: (_, user) => (
         <div className="flex items-center gap-4">
           <div
-            className={`w-[23%] flex items-center gap-1 rounded-md p-1 ${
+            className={` w-full sm:w-[20%] md:w-[40%] lg:w-[40%] xl:w-[23%] flex items-center gap-1 rounded-md p-1 ${
               user.status
                 ? "text-[#158844] bg-[#E8F7EE]"
                 : "text-[#C1A53F] bg-[#FCF5DC]"

@@ -1,10 +1,6 @@
 import React from "react";
 
 const DeleteSmModal = ({ closeModal, onDelete, variantId }) => {
-  const handleDeleteVariant = () => {
-    onDelete(variantId);
-    closeModal();
-  };
   return (
     <div className="fixed inset-0 p-4 flex flex-wrap justify-center items-center w-full h-full z-[1000] before:fixed before:inset-0 before:w-full before:h-full before:bg-[rgba(0,0,0,0.5)] overflow-auto font-[sans-serif]">
       <div className="w-full max-w-xs bg-white shadow-lg rounded-xl p-6 relative"> 
@@ -23,7 +19,7 @@ const DeleteSmModal = ({ closeModal, onDelete, variantId }) => {
             <button
               type="button"
               className="px-4 py-2 rounded-lg text-white text-sm bg-red-600 hover:bg-red-700 active:bg-red-600"
-              onClick={handleDeleteVariant}
+              onClick={onDelete}
             >
               Delete
             </button>

@@ -2,16 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Search,
   ChevronDown,
-  RefreshCw,
-  DotSquare,
   Edit2,
   Trash,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
-  deleteSalt,
+  deleteMedicine,
   getMedicines,
-  getSaltMolecule,
+  updateMedicine,
 } from "../../../api/HealthSyServicesApi";
 import toast from "react-hot-toast";
 import DynamicTable from "../../ui/Table";
@@ -24,10 +22,9 @@ import ViewDetails from "./ViewDetails";
 import sortsvg from "../../../assets/svg/sort.svg";
 import add from "../../../assets/svg/add.svg";
 import threedots from "../../../assets/svg/threedots.svg";
-
 import downloadsvg from "../../../assets/svg/download.svg";
-
 import ConfirmationModal from "../../../common/ConfirmationModal";
+
 function Index() {
   const tableRef = useRef(null);
   const navigate = useNavigate();
@@ -42,7 +39,6 @@ function Index() {
   const [totalItems, setTotalItems] = useState();
   const [searchText, setSearchText] = useState("");
   const [medicines, setMedicines] = useState([]);
-  const [selectedLetter, setSelectedLetter] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [DeleteId, setDeleteId] = useState(null);
   const [ActionUser, setActionUser] = useState(null);
@@ -125,16 +121,25 @@ function Index() {
 
   const handleEdit = (id) => {
     setAddAction("Edit Salt/Molecule");
-    navigate(`salt-molecule/edit-salt-molecule/${id}`);
+    navigate(`/healthsy-services/order-medicines/edit-medicine/${id}`);
   };
   const handleDelete = async (id) => {
     setDeleteId(id);
     setIsDeleteModalOpen(true);
   };
+  const handleStatus = async (user) => {
+    const data = {
+      ...user,
+      status: !user.status,
+    };
+    await updateMedicine(user._id, data);
+    setActionUser(null);
+    fetchMedicines(1, itemsPerPage, searchText, selectedSort);
+  };
   const confirmDelete = async () => {
     if (DeleteId) {
       try {
-        await deleteSalt(DeleteId);
+        await deleteMedicine(DeleteId);
         toast.success("Role removed successfully");
         fetchMedicines(1, itemsPerPage, searchText, selectedSort);
       } catch (error) {
@@ -150,11 +155,11 @@ function Index() {
   useEffect(() => {
     setAddAction("");
     setCurrentPage(1);
-    fetchMedicines(1, itemsPerPage, searchText, selectedSort, selectedLetter);
+    fetchMedicines(1, itemsPerPage, searchText, selectedSort);
     return () => {
       setMedicines([]);
     };
-  }, [itemsPerPage, searchText, selectedLetter, filterData]);
+  }, [itemsPerPage, searchText, filterData]);
 
   const columns = [
     {
@@ -168,14 +173,16 @@ function Index() {
       render: (_, user) => (
         <div className="flex gap-4">
           <div
-            className={`w-[42%] flex items-center space-x-2 rounded-md p-1 ${
-              user.status=="Active"
+            className={`w-full sm:w-[70%] md:w-[60%] lg:w-[60%] xl:w-[50%] flex items-center  space-x-2 rounded-md p-1 ${
+              user.status == "Active"
                 ? "text-[#158844] bg-[#E8F7EE]"
                 : "text-[#C1A53F] bg-[#FCF5DC]"
             }`}
           >
             <DotsSVG active={user.status} />
-            <span className="">{user.status==="Active" ? "Active" : "InActive"}</span>
+            <span className="">
+              {user.status === "Active" ? "Active" : "InActive"}
+            </span>
           </div>
 
           <div className="relative">
@@ -205,11 +212,11 @@ function Index() {
                   </li>
                   <li
                     className={`flex items-center gap-2 px-4 py-2 text-[14px]  cursor-pointer ${
-                      user.status
+                      !user.status
                         ? "text-[#158844] bg-[#E8F7EE]"
                         : "text-[#C1A53F] bg-[#FCF5DC]"
                     }`}
-                    onClick={() => handleDelete(user._id)}
+                    onClick={() => handleStatus(user)}
                   >
                     <svg
                       width="10"
@@ -221,11 +228,11 @@ function Index() {
                     >
                       <path
                         d="M4.85742 0.9375C2.61738 0.9375 0.794922 2.75996 0.794922 5C0.794922 7.24004 2.61738 9.0625 4.85742 9.0625C7.09746 9.0625 8.91992 7.24004 8.91992 5C8.91992 2.75996 7.09746 0.9375 4.85742 0.9375ZM6.32832 6.0291C6.35856 6.05783 6.38274 6.09232 6.39944 6.13055C6.41614 6.16877 6.42502 6.20995 6.42555 6.25166C6.42609 6.29336 6.41827 6.33476 6.40255 6.3734C6.38684 6.41203 6.36354 6.44713 6.33405 6.47663C6.30456 6.50612 6.26945 6.52941 6.23082 6.54513C6.19218 6.56084 6.15079 6.56867 6.10908 6.56813C6.06737 6.5676 6.02619 6.55872 5.98797 6.54202C5.94975 6.52532 5.91525 6.50114 5.88652 6.4709L4.85742 5.44199L3.82832 6.4709C3.76924 6.52703 3.69057 6.55786 3.60908 6.55682C3.52759 6.55577 3.44973 6.52294 3.39211 6.46531C3.33448 6.40769 3.30165 6.32983 3.3006 6.24834C3.29956 6.16686 3.33039 6.08818 3.38652 6.0291L4.41543 5L3.38652 3.9709C3.33039 3.91182 3.29956 3.83314 3.3006 3.75166C3.30165 3.67017 3.33448 3.59231 3.39211 3.53469C3.44973 3.47706 3.52759 3.44423 3.60908 3.44318C3.69057 3.44214 3.76924 3.47297 3.82832 3.5291L4.85742 4.55801L5.88652 3.5291C5.94561 3.47297 6.02428 3.44214 6.10577 3.44318C6.18725 3.44423 6.26511 3.47706 6.32274 3.53469C6.38036 3.59231 6.4132 3.67017 6.41424 3.75166C6.41528 3.83314 6.38445 3.91182 6.32832 3.9709L5.29941 5L6.32832 6.0291Z"
-                        fill={user.status ? "#158844" : "#C1A53F"}
+                        fill={!user.status ? "#158844" : "#C1A53F"}
                       />
                     </svg>
 
-                    {user.status ? "Active" : "Inactive"}
+                    {!user.status ? "Active" : "Inactive"}
                   </li>
                 </ul>
               </div>

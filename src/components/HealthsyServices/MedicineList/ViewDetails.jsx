@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ImageModal from "../../../common/ImageView";
-import {
-  getMedicineById,
-} from "../../../api/HealthSyServicesApi";
+import { getMedicineById } from "../../../api/HealthSyServicesApi";
 
 function ViewDetails({ id, setIsOpenView }) {
   const [openImageModal, setOpenImageModal] = useState(false);
@@ -211,10 +209,10 @@ function ViewDetails({ id, setIsOpenView }) {
                   {medicines?.images.map((item, index) => (
                     <div
                       key={index}
-                      className="w-auto border-b-[1px] h-auto p-3 bg-[#F5F5F5]"
+                      onClick={() => handleImageClick(medicines?.images)}
+                      className="w-auto border-b-[1px] h-auto p-2 bg-[#F5F5F5] cursor-pointer"
                     >
                       <img
-                        onClick={() => handleImageClick(medicines?.images)}
                         className="w-14 h-auto object-cover cursor-pointer"
                         src={item.url}
                         alt={`image-${index}`}
@@ -285,6 +283,77 @@ function ViewDetails({ id, setIsOpenView }) {
                     </div>
                   ))}
                 </div>
+              </div>
+              <div>
+                {medicines?.variants?.map((variant, index) => (
+                  <div key={index} className="p-2  rounded-lg  bg-gray-50 ">
+                    <h4 className="text-lg text-primary font-semibold mb-3 pb-2">
+                      Variant {index + 1}
+                    </h4>
+                    <div className="space-y-4">
+                      <div className="flex w-full">
+                        <span className="w-[37%] text-[16px] text-[#4D4D4D]">
+                          Name
+                        </span>
+                        <span className="w-1/2 text-base font-Mulish font-medium text-[#181423]">
+                          {variant.name}
+                        </span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-[37%] text-[16px] text-[#4D4D4D]">
+                          MRP
+                        </span>
+                        <span className="text-base font-Mulish font-medium text-[#181423]">
+                          {variant.mrp}
+                        </span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-[37%] text-[16px] text-[#4D4D4D]">
+                          Discount
+                        </span>
+                        <span className="text-base font-Mulish font-medium text-[#181423]">
+                          {variant.discount}%
+                        </span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-[37%] text-[16px] text-[#4D4D4D]">
+                          Package Description
+                        </span>
+                        <span className="text-base font-Mulish font-medium text-[#181423]">
+                          {variant.package_description}
+                        </span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-[37%] text-[16px] text-[#4D4D4D]">
+                          Quantity
+                        </span>
+                        <span className="text-base font-Mulish font-medium text-[#181423]">
+                          {variant.quantity}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="mt-5 p-2 border-t">
+                      <h4 className="text-[18px] text-primary font-semibold ">
+                        Variant {index + 1} - Medicine Images
+                      </h4>
+                      <div className="flex gap-2 ">
+                        {variant.images?.map((image, imgIndex) => (
+                          <div
+                            key={imgIndex}
+                            onClick={() => handleImageClick(variant?.images)}
+                            className="w-auto border-b-[1px] h-auto p-2 bg-[#F5F5F5] cursor-pointer"
+                          >
+                            <img
+                              className="w-14 h-auto object-cover "
+                              src={image.url}
+                              alt={`image-${imgIndex}`}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </>
           )}

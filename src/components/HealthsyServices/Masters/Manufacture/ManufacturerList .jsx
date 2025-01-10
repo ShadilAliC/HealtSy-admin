@@ -74,7 +74,7 @@ function ManufacturerList() {
       status: !user.status,
     };
     await updateManufacturer(user._id, data);
-    setActionUser(null)
+    setActionUser(null);
     fetchManufacturer(1, itemsPerPage, searchText, selectedSort);
   };
 
@@ -149,14 +149,16 @@ function ManufacturerList() {
       render: (_, user) => (
         <div className="flex gap-4">
           <div
-            className={`w-[40%] flex items-center gap-1 rounded-md p-1 ${
-              user.status
-                ? "text-[#158844] bg-[#E8F7EE]"
-                : "text-[#C1A53F] bg-[#FCF5DC]"
-            }`}
+            className={`flex items-center gap-1 rounded-md p-1 
+    ${
+      user.status
+        ? "text-[#158844] bg-[#E8F7EE]"
+        : "text-[#C1A53F] bg-[#FCF5DC]"
+    } 
+    w-full sm:w-[70%] md:w-[60%] lg:w-[60%] xl:w-[40%]`}
           >
             <DotsSVG active={user.status} />
-            <span className="">{user.status ? "Active" : "Inactive"}</span>
+            <span>{user.status ? "Active" : "Inactive"}</span>
           </div>
 
           <div className="relative">
@@ -186,7 +188,7 @@ function ManufacturerList() {
               </svg>
             </button>
             {ActionUser === user._id && (
-              <div className="absolute left-0 mt-2 bg-white shadow-md rounded-md w-32 z-10">
+              <div className="relative left-0 mt-2 bg-white shadow-md rounded-md w-32">
                 <ul className="py-1 p-2 space-y-1">
                   <li
                     className="flex items-center gap-2 px-4 py-2 bg-[#EFF8FE] text-[#4E91C2] text-[14px] cursor-pointer"

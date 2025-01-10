@@ -281,3 +281,33 @@ export async function getMedicineById(id) {
     return { success: false, message: err.message || "An error occurred" };
   }
 }
+
+export async function updateMedicine(id, data) {
+  try {
+    const response = await Api.patch(
+      `healthsy-services/medicines/${id}`,
+      data
+    );
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error("Failed to fetch data");
+    }
+  } catch (err) {
+    console.log(err);
+
+    return { success: false, message: err.message || "An error occurred" };
+  }
+}
+export async function deleteMedicine(id) {
+  try {
+    const response = await Api.delete(`healthsy-services/medicines/${id}`);
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error("Failed to fetch data");
+    }
+  } catch (err) {
+    return { success: false, message: err.message || "An error occurred" };
+  }
+}

@@ -44,3 +44,34 @@ export const deserializeImages = (serializedImages) => {
 //       throw error;
 //     }
 //   };
+const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_NAME}/image/upload`;
+const uploadPreset = "Healtsy";
+
+export async function uploadImagesToCloudinary(files) {
+  try {
+    const uploadedImages = await Promise.all(
+      files.map(async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", uploadPreset);
+
+        const response = await fetch(cloudinaryUrl, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to upload ${file.name}`);
+        }
+
+        const data = await response.json();
+        return data.secure_url;
+      })
+    );
+
+    return uploadedImages;
+  } catch (error) {
+    console.error("Error uploading images:", error);
+    throw error; // Re-throw the error for the caller to handle
+  }
+}

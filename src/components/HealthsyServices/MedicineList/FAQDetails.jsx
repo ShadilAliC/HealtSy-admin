@@ -1,24 +1,34 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import JoditEditor from "jodit-react";
 import MandatoryField from "../../../common/MandatoryField";
 import { Plus, Trash2 } from "lucide-react";
 import { useSelector } from "react-redux";
-import { createMedicine } from "../../../api/HealthSyServicesApi";
+import {
+  createMedicine,
+  updateMedicine,
+} from "../../../api/HealthSyServicesApi";
 import Success from "../../../common/Success";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-export default function FAQ({ placeholder = "Type here", setSelectedTab }) {
+export default function FAQDetails({
+  placeholder = "Type here",
+  setSelectedTab,
+  status,
+}) {
+  const { id } = useParams();
+
   const editor = useRef(null);
   const navigate = useNavigate();
-
   const medicineInfo = useSelector((state) => state.medicine.medicineInfo);
   const [isOpenSuccess, setIsOpenSuccess] = useState(false);
-    const [message, setMessage] = useState("");
-  
+  const [message, setMessage] = useState("");
+  console.log(medicineInfo, "medicineInfo");
+
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -52,23 +62,61 @@ export default function FAQ({ placeholder = "Type here", setSelectedTab }) {
         ...medicineInfo,
         ...data,
       };
-      const res = await createMedicine(mergedData);
-      if (res?.success) {
-        setIsOpenSuccess(true);
-        setMessage("New Medicine Added Successfully");
-        setTimeout(() => {
-          setIsOpenSuccess(false);
-          navigate("/healthsy-services/order-medicines/medicine-list");
-        }, 2000);
+      console.log(mergedData, "update");
+
+      if (status == "edit") {
+        const res = await updateMedicine(id, mergedData);
+        if (res?.success) {
+          setIsOpenSuccess(true);
+          setMessage("Medicine Updated Successfully");
+          setTimeout(() => {
+            setIsOpenSuccess(false);
+            navigate("/healthsy-services/order-medicines/medicine-list");
+          }, 2000);
+        } else {
+          toast.error(res.message || "Failed to add ProductType.");
+        }
       } else {
-        toast.error(res.message || "Failed to add ProductType.");
+        const res = await createMedicine(mergedData);
+        if (res?.success) {
+          setIsOpenSuccess(true);
+          setMessage("New Medicine Added Successfully");
+          setTimeout(() => {
+            setIsOpenSuccess(false);
+            navigate("/healthsy-services/order-medicines/medicine-list");
+          }, 2000);
+        } else {
+          toast.error(res.message || "Failed to add ProductType.");
+        }
       }
-      console.log(res);
+      // console.log(res);
     } catch (err) {
       console.error(err);
-      
     }
   };
+  useEffect(() => {
+    if (medicineInfo && id) {
+      setValue("description", medicineInfo?.faq?.faq_description);
+      setValue("author_details", medicineInfo?.faq?.author_details);
+      setValue(
+        "warning_and_precaution",
+        medicineInfo?.faq?.warning_and_precaution
+      );
+      setValue("direction_and_uses", medicineInfo?.faq?.direction_uses);
+      setValue("side_effects", medicineInfo?.faq?.side_effect);
+      setValue("storage_disposal", medicineInfo?.faq?.storage_disposal);
+      setValue("dosage", medicineInfo?.faq?.dosage);
+      setValue("reference", medicineInfo?.faq?.reference);
+
+      if (medicineInfo?.faq?.question_answers && medicineInfo?.faq?.question_answers.length > 0) {
+        medicineInfo?.faq?.question_answers.forEach((item) => {
+          console.log(item,'ss');
+          
+          append(item);
+        });
+      }
+    }
+  }, []);
 
   const handlePrevious = () => {
     setSelectedTab("medicine");
@@ -379,12 +427,21 @@ export default function FAQ({ placeholder = "Type here", setSelectedTab }) {
         >
           Previous Page
         </button>
-        <button
-          type="submit"
-          className="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#1AAA55] hover:bg-[#1AAA55] focus:outline-none"
-        >
-          Submit
-        </button>
+        {status == "edit" ? (
+          <button
+            type="submit"
+            className="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#3B86FF] hover:bg-[#3275e8] focus:outline-none"
+          >
+            update
+          </button>
+        ) : (
+          <button
+            type="submit"
+            className="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#1AAA55] hover:bg-[#1AAA55] focus:outline-none"
+          >
+            Submit
+          </button>
+        )}
       </div>
       {isOpenSuccess && <Success message={message} />}
     </form>

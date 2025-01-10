@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useMastersContext } from "../../../context/MastersContext";
-import FAQ from "./AddFAQ";
-import MedicineDetails from "./AddMedicineDetails";
-import test from "../../../assets/admin.png";
+import MedicineDetails from "./MedicineDetails";
+import FAQDetails from "./FAQDetails";
 
 function AddNewMedicine() {
   const { setAddAction } = useMastersContext();
@@ -13,11 +12,11 @@ function AddNewMedicine() {
   const renderTabContent = () => {
     switch (selectedtap) {
       case "medicine":
-        return <MedicineDetails setSelectedTab={setSelectedTab} />;
+        return <MedicineDetails setSelectedTab={setSelectedTab} status={"add"} />;
       case "faq":
-        return <FAQ setSelectedTab={setSelectedTab} />;
+        return <FAQDetails setSelectedTab={setSelectedTab} status={"add"}/>;
       default:
-        return <MedicineDetails />;
+        return <MedicineDetails status={"add"}/>;
     }
   };
 

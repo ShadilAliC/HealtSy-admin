@@ -11,13 +11,18 @@ import {
   getSaltMolecule,
   getUnit,
 } from "../../../api/HealthSyServicesApi";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
 import Select from "react-select";
 import { useDispatch, useSelector } from "react-redux";
-import { setMedicineInfo } from "../../../redux/Slices/MedicineSlice";
-import { deserializeImages } from "../../../lib/utils";
-import { uploadImages } from "../../../api/commonApi";
-function MedicineDetails({ setSelectedTab }) {
+import {
+  resetMedicineDetails,
+  setMedicineInfo,
+} from "../../../redux/Slices/MedicineSlice";
+import { uploadImagesToCloudinary } from "../../../lib/utils";
+import { useParams } from "react-router-dom";
+function MedicineDetails({ setSelectedTab, medicinesData }) {
+  console.log(medicinesData, "medicinesData", medicinesData?.name);
+  const { id } = useParams();
   const dispatch = useDispatch();
   const medicineInfo = useSelector((state) => state.medicine.medicineInfo);
   const [images, setImages] = useState([]);
@@ -29,7 +34,6 @@ function MedicineDetails({ setSelectedTab }) {
   const [units, setUnits] = useState([]);
   const [productTypes, setProductType] = useState([]);
   const [formError, setFormError] = useState("");
-  const [variants, setVariants] = useState([]);
   const [isReturnable, setIsReturnable] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     upload: true,
@@ -46,73 +50,29 @@ function MedicineDetails({ setSelectedTab }) {
   } = useForm({
     defaultValues: {
       ...medicineInfo,
-      manufacturer: medicineInfo.manufacturer || null,
-      salt_molecule: medicineInfo.salt_molecule || null,
-      unit: medicineInfo.unit || null,
+      // manufacturer: medicineInfo.manufacturer || null,
+      // salt_molecule: medicineInfo.salt_molecule || null,
+      // unit: medicineInfo.unit || null,
+      // variants: medicineInfo.variants || [],
     },
   });
+  console.log(medicineInfo, "medicineInfo.manufacturer");
 
-
-  // const handleFileChange = async (e) => {
-  //   if (!e.target.files || e.target.files.length === 0) return
-
-  //   const files = Array.from(e.target.files)
-  //   setLoading(true)
-  //   setImageCount(files.length)
-  //   setFormError(null)
-
-  //   try {
-  //     const formData = new FormData()
-  //     files.forEach((file) => formData.append('images', file))
-
-  //     const response = await uploadImages(formData)
-  //     console.log('Upload response:', response)
-
-  //     if (response && response.urls) {
-  //       setImages((prevImages) => [...prevImages, ...response.urls])
-  //     } else {
-  //       throw new Error('Invalid response from server')
-  //     }
-  //   } catch (err) {
-  //     console.error('Error in handleFileChange:', err)
-  //     setFormError('Error uploading images. Please try again.')
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // }
   const handleFileChange = async (e) => {
     if (!e.target.files || e.target.files.length === 0) return;
-
     const files = Array.from(e.target.files);
-    setLoading(true);
     setImageCount(files.length);
+    setLoading(true);
     setFormError(null);
+    setCurrentItem(0);
 
     try {
-      const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${
-        import.meta.env.VITE_CLOUDINARY_NAME
-      }/image/upload`; 
-      const uploadPreset = "Healtsy";
-
-      const uploadedImages = await Promise.all(
-        files.map(async (file) => {
-          const formData = new FormData();
-          formData.append("file", file);
-          formData.append("upload_preset", uploadPreset);
-          const response = await fetch(cloudinaryUrl, {
-            method: "POST",
-            body: formData,
-          });
-
-          if (!response.ok) {
-            throw new Error(`Failed to upload ${file.name}`);
-          }
-
-          const data = await response.json();
-          return data.secure_url;
-        })
-      );
-
+      const uploadedImages = [];
+      for (let i = 0; i < files.length; i++) {
+        const uploadedImage = await uploadImagesToCloudinary([files[i]]);
+        uploadedImages.push(...uploadedImage);
+        setCurrentItem((prev) => prev + 1);
+      }
       setImages((prevImages) => [...prevImages, ...uploadedImages]);
     } catch (err) {
       console.error("Error in handleFileChange:", err);
@@ -128,41 +88,150 @@ function MedicineDetails({ setSelectedTab }) {
       [section]: !prev[section],
     }));
   };
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "variants",
+  });
   const handleAddNewVariant = () => {
-    setVariants((prevVariants) => [
-      ...prevVariants,
-      { id: prevVariants.length + 1 },
-    ]);
-  };
-
-  const handleDeleteVariant = (variantId) => {
-    setVariants((prevVariants) => {
-      const filteredVariants = prevVariants.filter(
-        (variant) => variant.id !== variantId
-      );
-      return filteredVariants.map((variant, index) => ({
-        ...variant,
-        id: index + 1,
-      }));
+    append({
+      id: fields.length + 1,
+      name: "",
+      package_description: "",
+      mrp: "",
+      discount: "",
+      quantity: "",
+      mrp_per_unit: "",
+      unit: null,
+      images: [],
     });
   };
+
+  const handleDeleteVariant = (index) => {
+    remove(index);
+  };
   const nextForm = (data) => {
+    console.log(data, "skkkkkkk");
+
     if (images.length === 0) {
       setFormError(" No image selected. Please upload an image.");
       return;
     }
+    const formattedData = {
+      name: data.medicineName,
+      package_description: data.packageDescription,
+      type: data.medicineType,
+      stock: data.stock,
+      prescription_type: data.prescription_type,
+      status: data.status,
+      manufacturer: {
+        name: data.manufacturer.label,
+        address: data.manufacturer.data.manufacturer_address,
+        country: data.manufacturer.data.country_origin,
+        customer_care_email: data.manufacturer.data.customer_email,
+      },
+      pricing: {
+        mrp: data.mrp,
+        discount: data.discount,
+        quantity: data.quantity,
+        mrp_per_unit: data.mrp_per_unit,
+        unit: data.unit.label,
+        return_policy: {
+          returnable: data.return_policy,
+          open_box: data.open_box,
+        },
+      },
+      molecule_details: {
+        salt_molecule: data.salt_molecule.label,
+        therapeutic_classification: data.therapeutic_classification,
+        therapeutic_uses: data.therapeutic_uses,
+      },
+      variants: data.variants.map((variant) => ({
+        name: variant.name,
+        package_description: variant.package_description,
+        images: variant.images,
+        mrp: variant.mrp,
+        discount: variant.discount,
+        // Add other fields from the variant if needed
+      })),
+      faq: {
+        faq_description: data.description,
+        author_details: data.author_details,
+        warning_and_precaution: data.warning_and_precaution,
+        direction_uses: data.direction_and_uses,
+        side_effect: data.side_effects,
+        storage_disposal: data.storage_disposal,
+        dosage: data.dosage,
+        reference: data.reference,
+        question_answers: data.faqs,
+      },
+      images: images.map((image) => ({ url: image })),
+    };
     const mergedData = {
       ...data,
       images,
     };
-
-    dispatch(setMedicineInfo(mergedData));
+    console.log(mergedData,'sssssssssss');
+    
+    dispatch(setMedicineInfo(formattedData));
     setSelectedTab("faq");
   };
-  
+
+  useEffect(() => {
+    // if (medicineInfo && id) {
+      if (medicineInfo?.pricing?.return_policy?.returnable == "Returnable") {
+        setIsReturnable(true);
+      }
+      setImages(medicineInfo?.images || []);
+      setValue("medicineName", medicineInfo?.name);
+      setValue("packageDescription", medicineInfo.package_description);
+      setValue("medicineType", medicineInfo.type);
+      setValue("manufacturer", {
+        value: medicineInfo?.manufacturer?._id,
+        label: medicineInfo?.manufacturer?.name,
+        data: medicineInfo?.manufacturer,
+      });
+      setValue("manufacturer_address", medicineInfo?.manufacturer?.address);
+      setValue("country_origin", medicineInfo?.manufacturer?.country);
+      setValue(
+        "customer_email",
+        medicineInfo?.manufacturer?.customer_care_email
+      );
+      setValue("mrp", medicineInfo?.pricing?.mrp);
+      setValue("discount", medicineInfo?.pricing?.discount);
+      setValue("quantity", medicineInfo?.pricing?.quantity);
+      setValue("mrp_per_unit", medicineInfo?.pricing?.mrp_per_unit);
+      setValue("unit", {
+        value: medicineInfo?.pricing?._id,
+        label: medicineInfo?.pricing?.unit,
+        data: medicineInfo?.pricing,
+      });
+      setValue("returnWindow", medicineInfo?.pricing?.returnWindow);
+      setValue("salt_molecule", {
+        value: medicineInfo?.molecule_details?._id,
+        label: medicineInfo?.molecule_details?.salt_molecule,
+        data: medicineInfo?.molecule_details,
+      });
+      setValue(
+        "therapeutic_classification",
+        medicineInfo?.molecule_details?.therapeutic_classification
+      );
+      setValue(
+        "therapeutic_uses",
+        medicineInfo?.molecule_details?.therapeutic_uses
+      );
+      if (medicineInfo?.variants && medicineInfo?.variants?.length > 0) {
+        setValue("variants", medicineInfo?.variants);
+      }
+    // } else {
+    //   console.log("-----------------------", medicineInfo);
+
+    //   dispatch(resetMedicineDetails());
+    //   setImages(medicineInfo?.images || []);
+    // }
+  }, [medicineInfo,  id, dispatch, setValue]);
+
   useEffect(() => {
     try {
-      setImages(medicineInfo.images || []);
       const fetch = async () => {
         const [
           saltMoleculeResponse,
@@ -185,7 +254,7 @@ function MedicineDetails({ setSelectedTab }) {
       console.log(err);
     }
   }, []);
-  console.log(images, "----------");
+  console.log("-----------------------", medicineInfo);
 
   return (
     <div className="max-w-[90%] ">
@@ -266,8 +335,10 @@ function MedicineDetails({ setSelectedTab }) {
                 {...register("medicineName", {
                   required: "Medicine name is required",
                 })}
+                // defaultValue={medicinesData?.data?.name}
                 type="text"
                 id="medicineName"
+                value={medicinesData?.name}
                 className="w-full p-3 border border-transparent focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-lg text-gray-800 bg-gray-100 placeholder-gray-500 focus:outline-none"
                 placeholder="Enter your Pharmacy name"
               />
@@ -335,7 +406,7 @@ function MedicineDetails({ setSelectedTab }) {
                   <Controller
                     name="stock"
                     control={control}
-                    defaultValue={medicineInfo.stock}
+                    // defaultValue={medicinesData?.stock}
                     rules={{ required: "You must select a Stock" }}
                     render={({ field }) => (
                       <input
@@ -356,7 +427,7 @@ function MedicineDetails({ setSelectedTab }) {
                   <Controller
                     name="stock"
                     control={control}
-                    defaultValue={medicineInfo.stock}
+                    // defaultValue={medicinesData?.stock}
                     rules={{ required: "You must select a Stock" }}
                     render={({ field }) => (
                       <input
@@ -373,6 +444,7 @@ function MedicineDetails({ setSelectedTab }) {
                   </span>
                 </label>
               </div>
+
               {errors.stock && (
                 <span className="text-red-500">{errors.stock.message}</span>
               )}
@@ -387,9 +459,9 @@ function MedicineDetails({ setSelectedTab }) {
                   <Controller
                     name="prescription_type"
                     control={control}
-                    defaultValue={medicineInfo.prescription_type}
+                    defaultValue={id ? medicineInfo?.prescription_type : ""}
                     rules={{
-                      required: "You must select a  Prescription Type ",
+                      required: "You must select a Prescription Type",
                     }}
                     render={({ field }) => (
                       <input
@@ -410,9 +482,9 @@ function MedicineDetails({ setSelectedTab }) {
                   <Controller
                     name="prescription_type"
                     control={control}
-                    defaultValue={medicineInfo.prescription_type}
+                    defaultValue={ medicineInfo?.prescription_type}
                     rules={{
-                      required: "You must select a  Prescription Type ",
+                      required: "You must select a Prescription Type",
                     }}
                     render={({ field }) => (
                       <input
@@ -445,8 +517,8 @@ function MedicineDetails({ setSelectedTab }) {
                   <Controller
                     name="status"
                     control={control}
-                    defaultValue={medicineInfo.status}
-                    rules={{ required: "You must select a Medicine Status " }}
+                    defaultValue={medicineInfo?.status}
+                    rules={{ required: "You must select a Medicine Status" }}
                     render={({ field }) => (
                       <input
                         {...field}
@@ -466,13 +538,13 @@ function MedicineDetails({ setSelectedTab }) {
                   <Controller
                     name="status"
                     control={control}
-                    defaultValue={medicineInfo.status}
-                    rules={{ required: "You must select a Medicine Status " }}
+                    defaultValue={medicineInfo?.status}
+                    rules={{ required: "You must select a Medicine Status" }}
                     render={({ field }) => (
                       <input
                         {...field}
                         type="radio"
-                        checked={field.value === "Non-Active"}
+                        checked={id && field.value === "Non-Active"}
                         value="Non-Active"
                         className="hidden peer"
                       />
@@ -744,7 +816,9 @@ function MedicineDetails({ setSelectedTab }) {
                     })}
                   />
                   {errors.mrp_per_unit && (
-                    <p className="text-red-500 ">{errors.mrp_per_unit.message}</p>
+                    <p className="text-red-500 ">
+                      {errors.mrp_per_unit.message}
+                    </p>
                   )}
                 </div>
 
@@ -784,51 +858,67 @@ function MedicineDetails({ setSelectedTab }) {
                     Returnable <span className="text-red-500">*</span>
                   </label>
                   <div className="flex space-x-4">
+                    {/* Returnable Option */}
                     <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-[#FAE8EF]">
                       <Controller
                         name="return_policy"
                         control={control}
-                        defaultValue={medicineInfo.return_policy}
+                        defaultValue={
+                          medicineInfo?.pricing?.return_policy?.returnable
+                        }
                         rules={{ required: "You must select a Returnable" }}
                         render={({ field }) => (
-                          <input
-                            {...field}
-                            type="radio"
-                            checked={field.value === "Returnable"}
-                            value="Returnable"
-                            className="hidden peer"
-                            onChange={() => setIsReturnable(true)}
-                          />
+                          <>
+                            <input
+                              {...field}
+                              type="radio"
+                              checked={field.value === "Returnable"}
+                              value="Returnable"
+                              className="hidden peer"
+                              onChange={() => {
+                                field.onChange("Returnable");
+                                setIsReturnable(true);
+                              }}
+                            />
+                            <span className="text-gray-900 peer-checked:text-primary peer-checked:bg-[#FAE8EF] w-full h-full flex items-center justify-center">
+                              Returnable
+                            </span>
+                          </>
                         )}
                       />
-                      <span className="text-gray-900 peer-checked:text-primary peer-checked:bg-[#FAE8EF] w-full h-full flex items-center justify-center">
-                        Returnable
-                      </span>
                     </label>
 
-                    <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/20">
+                    <label className="flex items-center justify-center w-32 h-12 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-[#FAE8EF]">
                       <Controller
                         name="return_policy"
                         control={control}
-                        defaultValue={medicineInfo.return_policy}
+                        defaultValue={
+                          medicineInfo?.pricing?.return_policy?.returnable
+                        }
                         rules={{ required: "You must select a Returnable" }}
                         render={({ field }) => (
-                          <input
-                            {...field}
-                            type="radio"
-                            checked={field.value === "Non-Returnable"}
-                            value="Non-Returnable"
-                            className="hidden peer"
-                          />
+                          <>
+                            <input
+                              {...field}
+                              type="radio"
+                              checked={field.value === "Non-Returnable"}
+                              value="Non-Returnable"
+                              className="hidden peer"
+                              onChange={() => {
+                                field.onChange("Non-Returnable");
+                                setIsReturnable(false);
+                              }}
+                            />
+                            <span className="text-gray-900 peer-checked:text-primary peer-checked:bg-[#FAE8EF] w-full h-full flex items-center justify-center">
+                              Non-Returnable
+                            </span>
+                          </>
                         )}
                       />
-                      <span className="text-gray-900 peer-checked:text-primary peer-checked:bg-[#FAE8EF] w-full h-full flex items-center justify-center">
-                        Non-Returnable
-                      </span>
                     </label>
                   </div>
                   {errors.return_policy && (
-                    <p className="text-red-500  mt-2">
+                    <p className="text-red-500 mt-2">
                       {errors.return_policy.message}
                     </p>
                   )}
@@ -847,7 +937,12 @@ function MedicineDetails({ setSelectedTab }) {
                       id="returnWindow"
                       className="w-full p-3 border border-transparent focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-lg text-gray-800 bg-gray-100 placeholder-gray-500 focus:outline-none"
                       placeholder="Enter Return Window"
-                      {...register("returnWindow", { required: isReturnable })}
+                      {...register("returnWindow", {
+                        required:
+                          isReturnable ||
+                          medicineInfo?.pricing?.return_policy?.returnable ===
+                            "Returnable",
+                      })}
                     />
                     {errors.returnWindow && (
                       <p className="text-red-500 ">
@@ -866,7 +961,9 @@ function MedicineDetails({ setSelectedTab }) {
                       <Controller
                         name="open_box"
                         control={control}
-                        defaultValue={medicineInfo.open_box}
+                        defaultValue={
+                          medicineInfo?.pricing?.return_policy?.open_box
+                        }
                         rules={{ required: "You must select a  Open Box" }}
                         render={({ field }) => (
                           <input
@@ -887,7 +984,9 @@ function MedicineDetails({ setSelectedTab }) {
                       <Controller
                         name="open_box"
                         control={control}
-                        defaultValue={medicineInfo.open_box}
+                        defaultValue={
+                          medicineInfo?.pricing?.return_policy?.open_box
+                        }
                         rules={{ required: "You must select a Open Box" }}
                         render={({ field }) => (
                           <input
@@ -946,7 +1045,7 @@ function MedicineDetails({ setSelectedTab }) {
                     name="salt_molecule"
                     control={control}
                     defaultValue={null}
-                    rules={{ required: "Please select a      Salt/Molecule" }}
+                    rules={{ required: "Please select a Salt/Molecule" }}
                     render={({ field }) => (
                       <div>
                         <Select
@@ -1029,12 +1128,15 @@ function MedicineDetails({ setSelectedTab }) {
             </div>
           )}
         </div>
-        {variants.map((variant) => (
+        {fields.map((variant, index) => (
           <VariantForm
             key={variant.id}
             variantId={variant.id}
             units={units}
-            onDelete={handleDeleteVariant}
+            onDelete={() => handleDeleteVariant(index)}
+            index={index}
+            control={control}
+            errors={errors}
           />
         ))}
 

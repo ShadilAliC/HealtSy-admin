@@ -8,7 +8,7 @@ const DynamicTable = ({ columns, data, className = "", loading, tableRef }) => {
   const isEmpty = data.length === 0;
 
   return (
-    <div className="relative  w-full h-full min-h-[350px] border overflow-auto scroll-1">
+    <div className="relative w-full h-full min-h-[350px] border text-nowrap overflow-auto scroll-1">
       {loading ? (
         <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 ">
           <Loading />
@@ -35,7 +35,7 @@ const DynamicTable = ({ columns, data, className = "", loading, tableRef }) => {
             {data.map((row, rowIndex) => (
               <tr
                 key={row.id || rowIndex}
-                className="bg-white border-b text-[15px] text-[#181423] font-Mulish dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                className="bg-white border-b text-[16px] text-[#181423] font-Mulish dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
               >
                 {columns.map((column) => (
                   <td

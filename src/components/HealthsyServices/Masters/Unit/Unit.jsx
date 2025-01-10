@@ -151,7 +151,7 @@ function Unit() {
       render: (_, user) => (
         <div className="flex items-center gap-4">
           <div
-            className={`w-[20%] flex items-center gap-1 rounded-md p-1 ${
+            className={` w-full sm:w-[70%] md:w-[35%] lg:w-[35%] xl:w-[20%] flex items-center gap-1 rounded-md p-1 ${
               user.status
                 ? "text-[#158844] bg-[#E8F7EE]"
                 : "text-[#C1A53F] bg-[#FCF5DC]"

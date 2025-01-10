@@ -15,6 +15,7 @@ import AddUnit from "../components/HealthsyServices/Masters/Unit/AddUnit";
 import EditUnit from "../components/HealthsyServices/Masters/Unit/EditUnit";
 import AddProductType from "../components/HealthsyServices/Masters/ProductType/AddProductType ";
 import EditProductType from "../components/HealthsyServices/Masters/ProductType/EditProductType ";
+import EditMedicine from "../components/HealthsyServices/MedicineList/EditMedicine";
 
 function AllRoutes() {
   const location = useLocation();
@@ -44,6 +45,10 @@ function AllRoutes() {
           <Route
             path="healthsy-services/order-medicines/add-new-medicine"
             element={<AddNewMedicine />}
+          />
+           <Route
+            path="healthsy-services/order-medicines/edit-medicine/:id"
+            element={<EditMedicine />}
           />
            <Route
             path="healthsy-services/order-medicines/masters/manufacturer/add-manufacturer"

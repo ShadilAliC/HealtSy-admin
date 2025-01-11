@@ -14,14 +14,10 @@ import {
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import Select from "react-select";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  resetMedicineDetails,
-  setMedicineInfo,
-} from "../../../redux/Slices/MedicineSlice";
-import {uploadImagesToCloudinary } from "../../../lib/utils";
+import { setMedicineInfo } from "../../../redux/Slices/MedicineSlice";
+import { uploadImagesToCloudinary } from "../../../lib/utils";
 import { useParams } from "react-router-dom";
 function MedicineDetails({ setSelectedTab, medicinesData }) {
-  console.log(medicinesData, "medicinesData", medicinesData?.name);
   const { id } = useParams();
   const dispatch = useDispatch();
   const medicineInfo = useSelector((state) => state.medicine.medicineInfo);
@@ -50,14 +46,8 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
   } = useForm({
     defaultValues: {
       ...medicineInfo,
-      // manufacturer: medicineInfo.manufacturer || null,
-      // salt_molecule: medicineInfo.salt_molecule || null,
-      // unit: medicineInfo.unit || null,
-      // variants: medicineInfo.variants || [],
     },
   });
-  console.log(medicineInfo, "medicineInfo.manufacturer");
-
   const handleFileChange = async (e) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const files = Array.from(e.target.files);
@@ -110,15 +100,10 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
     remove(index);
   };
   const nextForm = (data) => {
-    console.log(data, "skkkkkkk");
-
     if (images.length === 0) {
       setFormError(" No image selected. Please upload an image.");
       return;
     }
-    console.log(images,'llllllllllllllll');
-    
-    
     const formattedData = {
       name: data.medicineName,
       package_description: data.packageDescription,
@@ -141,7 +126,7 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
         return_policy: {
           returnable: data.return_policy,
           open_box: data.open_box,
-          return_window:data.returnWindow,
+          return_window: data.returnWindow,
         },
       },
       molecule_details: {
@@ -155,6 +140,9 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
         images: variant.images,
         mrp: variant.mrp,
         discount: variant.discount,
+        quantity:variant.quantity,
+        mrp_per_unit:variant.mrp_per_unit,
+        unit:variant.unit,
       })),
       faq: {
         faq_description: medicineInfo?.faq?.faq_description,
@@ -167,72 +155,58 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
         reference: medicineInfo?.faq?.reference,
         question_answers: medicineInfo?.faq?.question_answers,
       },
-     
-      images:images,
+      images: images,
     };
-    const mergedData = {
-      ...data,
-      images,
-    };
-    console.log(mergedData,'sssssssssss');
-    
     dispatch(setMedicineInfo(formattedData));
     setSelectedTab("faq");
   };
 
   useEffect(() => {
-    // if (medicineInfo && id) {
-      if (medicineInfo?.pricing?.return_policy?.returnable == "Returnable") {
-        setIsReturnable(true);
-      }
-      setImages(medicineInfo?.images || []);
-      setValue("medicineName", medicineInfo?.name);
-      setValue("packageDescription", medicineInfo.package_description);
-      setValue("medicineType", medicineInfo.type);
-      setValue("manufacturer", {
-        value: medicineInfo?.manufacturer?._id,
-        label: medicineInfo?.manufacturer?.name,
-        data: medicineInfo?.manufacturer,
-      });
-      setValue("manufacturer_address", medicineInfo?.manufacturer?.address);
-      setValue("country_origin", medicineInfo?.manufacturer?.country);
-      setValue(
-        "customer_email",
-        medicineInfo?.manufacturer?.customer_care_email
-      );
-      setValue("mrp", medicineInfo?.pricing?.mrp);
-      setValue("discount", medicineInfo?.pricing?.discount);
-      setValue("quantity", medicineInfo?.pricing?.quantity);
-      setValue("mrp_per_unit", medicineInfo?.pricing?.mrp_per_unit);
-      setValue("unit", {
-        value: medicineInfo?.pricing?._id,
-        label: medicineInfo?.pricing?.unit,
-        data: medicineInfo?.pricing,
-      });
-      setValue("returnWindow", medicineInfo?.pricing?.return_policy?.return_window);
-      setValue("salt_molecule", {
-        value: medicineInfo?.molecule_details?._id,
-        label: medicineInfo?.molecule_details?.salt_molecule,
-        data: medicineInfo?.molecule_details,
-      });
-      setValue(
-        "therapeutic_classification",
-        medicineInfo?.molecule_details?.therapeutic_classification
-      );
-      setValue(
-        "therapeutic_uses",
-        medicineInfo?.molecule_details?.therapeutic_uses
-      );
-      if (medicineInfo?.variants && medicineInfo?.variants?.length > 0) {
-        setValue("variants", medicineInfo?.variants);
-      }
-    // } else {
-    //   console.log("-----------------------", medicineInfo);
-
-    //   dispatch(resetMedicineDetails());
-    //   setImages(medicineInfo?.images || []);
-    // }
-  }, [medicineInfo,  id, dispatch, setValue]);
+    if (medicineInfo?.pricing?.return_policy?.returnable == "Returnable") {
+      setIsReturnable(true);
+    }
+    setImages(medicineInfo?.images || []);
+    setValue("medicineName", medicineInfo?.name);
+    setValue("packageDescription", medicineInfo.package_description);
+    setValue("medicineType", medicineInfo.type);
+    setValue("manufacturer", {
+      value: medicineInfo?.manufacturer?._id,
+      label: medicineInfo?.manufacturer?.name,
+      data: medicineInfo?.manufacturer,
+    });
+    setValue("manufacturer_address", medicineInfo?.manufacturer?.address);
+    setValue("country_origin", medicineInfo?.manufacturer?.country);
+    setValue("customer_email", medicineInfo?.manufacturer?.customer_care_email);
+    setValue("mrp", medicineInfo?.pricing?.mrp);
+    setValue("discount", medicineInfo?.pricing?.discount);
+    setValue("quantity", medicineInfo?.pricing?.quantity);
+    setValue("mrp_per_unit", medicineInfo?.pricing?.mrp_per_unit);
+    setValue("unit", {
+      value: medicineInfo?.pricing?._id,
+      label: medicineInfo?.pricing?.unit,
+      data: medicineInfo?.pricing,
+    });
+    setValue(
+      "returnWindow",
+      medicineInfo?.pricing?.return_policy?.return_window
+    );
+    setValue("salt_molecule", {
+      value: medicineInfo?.molecule_details?._id,
+      label: medicineInfo?.molecule_details?.salt_molecule,
+      data: medicineInfo?.molecule_details,
+    });
+    setValue(
+      "therapeutic_classification",
+      medicineInfo?.molecule_details?.therapeutic_classification
+    );
+    setValue(
+      "therapeutic_uses",
+      medicineInfo?.molecule_details?.therapeutic_uses
+    );
+    if (medicineInfo?.variants && medicineInfo?.variants?.length > 0) {
+      setValue("variants", medicineInfo?.variants);
+    }
+  }, [medicineInfo, id, dispatch, setValue]);
 
   useEffect(() => {
     try {
@@ -258,8 +232,6 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
       console.log(err);
     }
   }, []);
-  console.log("-----------------------", medicineInfo);
-
   return (
     <div className="max-w-[90%] ">
       <form
@@ -339,7 +311,6 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
                 {...register("medicineName", {
                   required: "Medicine name is required",
                 })}
-                // defaultValue={medicinesData?.data?.name}
                 type="text"
                 id="medicineName"
                 value={medicinesData?.name}
@@ -410,7 +381,6 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
                   <Controller
                     name="stock"
                     control={control}
-                    // defaultValue={medicinesData?.stock}
                     rules={{ required: "You must select a Stock" }}
                     render={({ field }) => (
                       <input
@@ -431,7 +401,6 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
                   <Controller
                     name="stock"
                     control={control}
-                    // defaultValue={medicinesData?.stock}
                     rules={{ required: "You must select a Stock" }}
                     render={({ field }) => (
                       <input
@@ -486,7 +455,7 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
                   <Controller
                     name="prescription_type"
                     control={control}
-                    defaultValue={ medicineInfo?.prescription_type}
+                    defaultValue={medicineInfo?.prescription_type}
                     rules={{
                       required: "You must select a Prescription Type",
                     }}
@@ -599,35 +568,50 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
                     rules={{ required: "Please select a manufacturer" }}
                     defaultValue={null}
                     render={({ field }) => (
-                      <Select
-                        {...field}
-                        options={manufacturers.map((manufacturer) => ({
-                          value: manufacturer._id,
-                          label: manufacturer.name,
-                          data: manufacturer,
-                        }))}
-                        placeholder="Select a Manufacturer"
-                        className="w-full"
-                        classNamePrefix="react-select"
-                        isClearable
-                        onChange={(selectedOption) => {
-                          field.onChange(selectedOption);
-                          const selectedManufacturer =
-                            selectedOption?.data;
-                          setValue(
-                            "manufacturer_address",
-                            selectedManufacturer.manufacturer_address ||medicineInfo?.manufacturer?.address|| ""
-                          );
-                          setValue(
-                            "country_origin",
-                            selectedManufacturer.country_origin || medicineInfo?.manufacturer?.country|| ""
-                          );
-                          setValue(
-                            "customer_email",
-                            selectedManufacturer.customer_email ||medicineInfo?.manufacturer?.customer_care_email|| ""
-                          );
-                        }}
-                      />
+                      <div className="relative">
+                        <Select
+                          {...field}
+                          options={manufacturers.map((manufacturer) => ({
+                            value: manufacturer._id,
+                            label: manufacturer.name,
+                            data: manufacturer,
+                          }))}
+                          placeholder="Select a Manufacturer"
+                          className="w-full"
+                          classNames={{
+                            control: (state) =>
+                              `!min-h-12 !bg-gray-100 !border-transparent hover:!border-primary focus:!border-primary !rounded-lg !shadow-none
+                    ${state.isFocused ? "!ring-1 !ring-primary/50" : ""}`,
+                            placeholder: () => "!text-gray-500",
+                            input: () => "!text-gray-800",
+                            option: () => "!text-gray-800",
+                            menuList: () => "!bg-white !rounded-lg !shadow-lg",
+                          }}
+                          onChange={(selectedOption) => {
+                            field.onChange(selectedOption);
+                            const selectedManufacturer = selectedOption?.data;
+                            setValue(
+                              "manufacturer_address",
+                              selectedManufacturer?.manufacturer_address ||
+                                medicineInfo?.manufacturer?.address ||
+                                ""
+                            );
+                            setValue(
+                              "country_origin",
+                              selectedManufacturer?.country_origin ||
+                                medicineInfo?.manufacturer?.country ||
+                                ""
+                            );
+                            setValue(
+                              "customer_email",
+                              selectedManufacturer?.customer_email ||
+                                medicineInfo?.manufacturer
+                                  ?.customer_care_email ||
+                                ""
+                            );
+                          }}
+                        />
+                      </div>
                     )}
                   />
                   {errors.manufacturer && (
@@ -847,6 +831,15 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
                         }))}
                         placeholder="Select Unit"
                         className="w-full"
+                        classNames={{
+                          control: (state) =>
+                            `!min-h-12 !bg-gray-100 !border-transparent hover:!border-primary focus:!border-primary !rounded-lg !shadow-none
+                  ${state.isFocused ? "!ring-1 !ring-primary/50" : ""}`,
+                          placeholder: () => "!text-gray-500",
+                          input: () => "!text-gray-800",
+                          option: () => "!text-gray-800",
+                          menuList: () => "!bg-white !rounded-lg !shadow-lg",
+                        }}
                         classNamePrefix="react-select"
                         isClearable
                       />
@@ -1061,6 +1054,15 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
                           }))}
                           placeholder="Select a Salt/Molecule"
                           className="w-full"
+                          classNames={{
+                            control: (state) =>
+                              `!min-h-12 !bg-gray-100 !border-transparent hover:!border-primary focus:!border-primary !rounded-lg !shadow-none
+                    ${state.isFocused ? "!ring-1 !ring-primary/50" : ""}`,
+                            placeholder: () => "!text-gray-500",
+                            input: () => "!text-gray-800",
+                            option: () => "!text-gray-800",
+                            menuList: () => "!bg-white !rounded-lg !shadow-lg",
+                          }}
                           classNamePrefix="react-select"
                           isClearable
                           onChange={(selectedOption) => {

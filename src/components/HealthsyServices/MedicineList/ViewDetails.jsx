@@ -360,28 +360,29 @@ function ViewDetails({ id, setIsOpenView }) {
 
           {activeTab === "faq" && (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-1 gap-5 ">
+              <div className="grid grid-cols-1 gap-4 max-w-4xl">
                 {FadData.map((detail, index) => (
-                  <>
-                    <div key={index} className="flex border-b  p-2">
-                      <div className="w-[38%] font-Mulish justify-start ">
-                        <span className="text-[16px] text-[#4D4D4D]">
-                          {detail.label}
-                        </span>
-                      </div>
-                      <div className="w-1/2 justify-start border-r ">
-                        <h1 className="text-[16px] font-Mulish font-medium text-[#181423]">
-                          {detail.value}
-                        </h1>
-                      </div>
+                  <div
+                    key={index}
+                    className="flex  border-b border-gray-200 py-3 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="w-2/5 pr-4">
+                      <span className="text-base font-Mulish text-[#4D4D4D] font-normal">
+                        {detail.label}
+                      </span>
                     </div>
-                  </>
+                    <div className="w-3/5 pl-4 border-l border-gray-200">
+                      <h1 className="text-base font-Mulish text-[#181423] font-medium">
+                        {detail.value}
+                      </h1>
+                    </div>
+                  </div>
                 ))}
               </div>
               <div>
                 {medicines?.faq?.question_answers.length > 0 && (
                   <div className="p-2  rounded-lg ">
-                    <h4 className="text-lg text-primary font-semibold mb-1  pb-2">
+                    <h4 className="text-lg text-primary font-semibold mb-1  ">
                       FAQ's
                     </h4>
                     <ul className="space-y-3 ">

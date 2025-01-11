@@ -1,27 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Plus,
   Search,
   ChevronDown,
-  RefreshCw,
   Edit2,
   Trash,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   deleteManufacturer,
-  deleteSalt,
   getManufacturer,
-  getSaltMolecule,
   updateManufacturer,
 } from "../../../../api/HealthSyServicesApi";
 import DynamicTable from "../../../ui/Table";
 import Pagination from "../../../../common/Pagination";
 import DeleteModal from "../../../../common/DeleteModal";
 import toast from "react-hot-toast";
-
 import { useMastersContext } from "../../../../context/MastersContext";
 import { DotsSVG } from "../../../ui/Dots";
+
 function ManufacturerList() {
   const tableRef = useRef(null);
   const navigate = useNavigate();
@@ -188,7 +184,7 @@ function ManufacturerList() {
               </svg>
             </button>
             {ActionUser === user._id && (
-              <div className="relative left-0 mt-2 bg-white shadow-md rounded-md w-32">
+              <div className="absolute left-0 mt-2 bg-white shadow-md rounded-md w-32 z-10">
                 <ul className="py-1 p-2 space-y-1">
                   <li
                     className="flex items-center gap-2 px-4 py-2 bg-[#EFF8FE] text-[#4E91C2] text-[14px] cursor-pointer"

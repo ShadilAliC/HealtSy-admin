@@ -3,8 +3,6 @@ import Loading from "../../common/Loading";
 import Empty from "../../common/Empty";
 
 const DynamicTable = ({ columns, data, className = "", loading, tableRef }) => {
-  console.log(data,'lslslsl');
-  
   const isEmpty = data.length === 0;
 
   return (

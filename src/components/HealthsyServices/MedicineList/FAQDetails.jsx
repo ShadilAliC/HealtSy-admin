@@ -16,21 +16,18 @@ export default function FAQDetails({
   setSelectedTab,
   status,
 }) {
-  console.log(status,'ssssss');
-  
   const { id } = useParams();
-
   const editor = useRef(null);
   const navigate = useNavigate();
   const medicineInfo = useSelector((state) => state.medicine.medicineInfo);
   const [isOpenSuccess, setIsOpenSuccess] = useState(false);
   const [message, setMessage] = useState("");
-  console.log(medicineInfo, "medicineInfo");
 
   const {
     control,
     handleSubmit,
     setValue,
+    
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -45,7 +42,7 @@ export default function FAQDetails({
       faqs: [],
     },
   });
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append,replace, remove } = useFieldArray({
     control,
     name: "faqs",
   });
@@ -111,11 +108,12 @@ export default function FAQDetails({
       setValue("reference", medicineInfo?.faq?.reference);
 
       if (medicineInfo?.faq?.question_answers && medicineInfo?.faq?.question_answers.length > 0) {
-        medicineInfo?.faq?.question_answers.forEach((item) => {
-          console.log(item,'ss');
-          
-          append(item);
-        });
+        replace(medicineInfo.faq.question_answers);
+        // medicineInfo?.faq?.question_answers.forEach((item) => {
+        //   console.log(item,'ss');
+        //   // reset();
+        //   append(item);
+        // });
       }
     }
   }, []);

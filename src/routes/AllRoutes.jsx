@@ -19,7 +19,6 @@ import EditMedicine from "../components/HealthsyServices/MedicineList/EditMedici
 
 function AllRoutes() {
   const location = useLocation();
-
   return (
     <MastersProvider>
       <Routes location={location} key={location.pathname}>

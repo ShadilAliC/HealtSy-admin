@@ -1,10 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Search,
-  ChevronDown,
-  Edit2,
-  Trash,
-} from "lucide-react";
+import { Search, ChevronDown, Edit2, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   deleteMedicine,
@@ -24,10 +19,14 @@ import add from "../../../assets/svg/add.svg";
 import threedots from "../../../assets/svg/threedots.svg";
 import downloadsvg from "../../../assets/svg/download.svg";
 import ConfirmationModal from "../../../common/ConfirmationModal";
+import { useDispatch } from "react-redux";
+import { resetMedicineDetails } from "../../../redux/Slices/MedicineSlice";
 
 function Index() {
   const tableRef = useRef(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const [loading, setLoading] = useState(false);
   const { setAddAction } = useMastersContext();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -77,8 +76,9 @@ function Index() {
 
   const createNewMedicine = () => {
     setAddAction("Order Medicines / Add New Medicine");
-    window.location.href = "/healthsy-services/order-medicines/add-new-medicine";
-};
+    dispatch(resetMedicineDetails());
+    navigate("/healthsy-services/order-medicines/add-new-medicine");
+  };
 
   const ActionDropdown = (id) => {
     setActionUser((prev) => (prev === id ? null : id));
@@ -261,7 +261,7 @@ function Index() {
           {user.images && user.images[0] ? (
             <img
               src={user.images[0]}
-              className="w-12 h-12 object-cover"
+              className="w-12 h-12 object-contain "
               alt={user.name || "Image"}
             />
           ) : (

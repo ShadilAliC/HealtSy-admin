@@ -16,6 +16,8 @@ export default function FAQDetails({
   setSelectedTab,
   status,
 }) {
+  console.log(status,'ssssss');
+  
   const { id } = useParams();
 
   const editor = useRef(null);

@@ -214,7 +214,7 @@ function ViewDetails({ id, setIsOpenView }) {
                     >
                       <img
                         className="w-14 h-auto object-cover cursor-pointer"
-                        src={item.url}
+                        src={item}
                         alt={`image-${index}`}
                       />
                     </div>

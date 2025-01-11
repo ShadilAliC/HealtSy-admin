@@ -77,8 +77,8 @@ function Index() {
 
   const createNewMedicine = () => {
     setAddAction("Order Medicines / Add New Medicine");
-    navigate("/healthsy-services/order-medicines/add-new-medicine");
-  };
+    window.location.href = "/healthsy-services/order-medicines/add-new-medicine";
+};
 
   const ActionDropdown = (id) => {
     setActionUser((prev) => (prev === id ? null : id));
@@ -258,9 +258,9 @@ function Index() {
       header: "Image",
       render: (_, user) => (
         <span className="text-md font-bold font-Mulish cursor-pointer">
-          {user.images && user.images[0]?.url ? (
+          {user.images && user.images[0] ? (
             <img
-              src={user.images[0].url}
+              src={user.images[0]}
               className="w-12 h-12 object-cover"
               alt={user.name || "Image"}
             />

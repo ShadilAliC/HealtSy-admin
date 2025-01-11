@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import MandatoryField from "../../../common/MandatoryField";
-import { Plus } from "lucide-react";
+import { Images, Plus } from "lucide-react";
 import UploadLoader from "../../ui/UploadLaoder";
 import UploadImagePreview from "../../ui/UploadImagePreview";
 import VariantForm from "../../ui/RenderVariantForm";
@@ -18,7 +18,7 @@ import {
   resetMedicineDetails,
   setMedicineInfo,
 } from "../../../redux/Slices/MedicineSlice";
-import { uploadImagesToCloudinary } from "../../../lib/utils";
+import {uploadImagesToCloudinary } from "../../../lib/utils";
 import { useParams } from "react-router-dom";
 function MedicineDetails({ setSelectedTab, medicinesData }) {
   console.log(medicinesData, "medicinesData", medicinesData?.name);
@@ -116,6 +116,9 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
       setFormError(" No image selected. Please upload an image.");
       return;
     }
+    console.log(images,'llllllllllllllll');
+    
+    
     const formattedData = {
       name: data.medicineName,
       package_description: data.packageDescription,
@@ -138,6 +141,7 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
         return_policy: {
           returnable: data.return_policy,
           open_box: data.open_box,
+          return_window:data.returnWindow,
         },
       },
       molecule_details: {
@@ -151,20 +155,20 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
         images: variant.images,
         mrp: variant.mrp,
         discount: variant.discount,
-        // Add other fields from the variant if needed
       })),
       faq: {
-        faq_description: data.description,
-        author_details: data.author_details,
-        warning_and_precaution: data.warning_and_precaution,
-        direction_uses: data.direction_and_uses,
-        side_effect: data.side_effects,
-        storage_disposal: data.storage_disposal,
-        dosage: data.dosage,
-        reference: data.reference,
-        question_answers: data.faqs,
+        faq_description: medicineInfo?.faq?.faq_description,
+        author_details: medicineInfo?.faq?.author_details,
+        warning_and_precaution: medicineInfo?.faq?.warning_and_precaution,
+        direction_uses: medicineInfo?.faq?.direction_uses,
+        side_effect: medicineInfo?.faq?.side_effect,
+        storage_disposal: medicineInfo?.faq?.storage_disposal,
+        dosage: medicineInfo?.faq?.dosage,
+        reference: medicineInfo?.faq?.reference,
+        question_answers: medicineInfo?.faq?.question_answers,
       },
-      images: images.map((image) => ({ url: image })),
+     
+      images:images,
     };
     const mergedData = {
       ...data,
@@ -205,7 +209,7 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
         label: medicineInfo?.pricing?.unit,
         data: medicineInfo?.pricing,
       });
-      setValue("returnWindow", medicineInfo?.pricing?.returnWindow);
+      setValue("returnWindow", medicineInfo?.pricing?.return_policy?.return_window);
       setValue("salt_molecule", {
         value: medicineInfo?.molecule_details?._id,
         label: medicineInfo?.molecule_details?.salt_molecule,
@@ -609,18 +613,18 @@ function MedicineDetails({ setSelectedTab, medicinesData }) {
                         onChange={(selectedOption) => {
                           field.onChange(selectedOption);
                           const selectedManufacturer =
-                            selectedOption?.data || {};
+                            selectedOption?.data;
                           setValue(
                             "manufacturer_address",
-                            selectedManufacturer.manufacturer_address || ""
+                            selectedManufacturer.manufacturer_address ||medicineInfo?.manufacturer?.address|| ""
                           );
                           setValue(
                             "country_origin",
-                            selectedManufacturer.country_origin || ""
+                            selectedManufacturer.country_origin || medicineInfo?.manufacturer?.country|| ""
                           );
                           setValue(
                             "customer_email",
-                            selectedManufacturer.customer_email || ""
+                            selectedManufacturer.customer_email ||medicineInfo?.manufacturer?.customer_care_email|| ""
                           );
                         }}
                       />

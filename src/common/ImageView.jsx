@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 
 function ImageModal({ selectedImage, onClose }) {
-  console.log(selectedImage,'selectedImage');
-  
+  console.log(selectedImage, "selectedImage");
+
   const [activeImage, setActiveImage] = useState(selectedImage[0]);
 
   const handleImageClick = (item) => {
@@ -24,7 +24,7 @@ function ImageModal({ selectedImage, onClose }) {
           <div className="p-6 bg-[#F3F3F3] flex justify-center items-center">
             <img
               className="w-full p-8 max-h-[45vh] object-contain rounded-lg"
-              src={activeImage.url}
+              src={activeImage}
               alt="Selected"
             />
           </div>
@@ -41,7 +41,7 @@ function ImageModal({ selectedImage, onClose }) {
             >
               <img
                 className="w-[84px] h-[84px] object-contain rounded-md"
-                src={item.url}
+                src={item}
                 alt={`Thumbnail ${index}`}
               />
             </div>

@@ -22,6 +22,8 @@ function EditMedicine() {
         setIsLoading(true);
         const res = await getMedicineById(id);
         setMedicines(res.data);
+        console.log(res.data,'lllllllllllll');
+        
         dispatch(setMedicineInfo(res.data));
       } catch (error) {
         console.error("Error fetching medicine:", error);

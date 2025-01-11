@@ -254,101 +254,100 @@ const VariantForm = ({ variantId, units, onDelete, index, control }) => {
           )}
         </div>
         <div>
-          <label
-            htmlFor={`quantity-${index}`}
-            className="block mb-2 text-sm font-medium text-[#4D4D4D]"
-          >
-            Quantity <MandatoryField />
-          </label>
-          <Controller
-            name={`variants.${index}.quantity`}
-            control={control}
-            defaultValue=""
-            rules={{
-              required: "Quantity is required",
-              min: { value: 1, message: "Quantity must be at least 1" },
-            }}
-            render={({ field }) => (
-              <input
-                {...field}
-                type="number"
-                id={`quantity-${index}`}
-                className="w-full p-3 border border-transparent focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-lg text-gray-800 bg-gray-100 placeholder-gray-500 focus:outline-none"
-                placeholder="Enter quantity"
-              />
-            )}
-          />
-          {errors.variants?.[index]?.quantity && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.variants[index].quantity.message}
-            </p>
+        <label
+          htmlFor={`quantity-${index}`}
+          className="block mb-2 text-sm font-medium text-[#4D4D4D]"
+        >
+          Quantity <MandatoryField />
+        </label>
+        <Controller
+          name={`variants.${index}.quantity`}
+          control={control}
+          defaultValue=""
+          rules={{
+            required: "Quantity is required",
+            min: { value: 1, message: "Quantity must be at least 1" },
+          }}
+          render={({ field }) => (
+            <input
+              {...field}
+              type="number"
+              id={`quantity-${index}`}
+              className="w-full p-3 border border-transparent focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-lg text-gray-800 bg-gray-100 placeholder-gray-500 focus:outline-none"
+              placeholder="Enter quantity"
+            />
           )}
-        </div>
-        <div>
-          <label
-            htmlFor={`mrp_per_unit-${index}`}
-            className="block mb-2 text-sm font-medium text-[#4D4D4D]"
-          >
-            MRP Per Unit <MandatoryField />
-          </label>
-          <Controller
-            name={`variants.${index}.mrp_per_unit`}
-            control={control}
-            defaultValue=""
-            rules={{
-              required: "MRP per unit is required",
-              min: { value: 0, message: "MRP per unit must be positive" },
-            }}
-            render={({ field }) => (
-              <input
-                {...field}
-                type="number"
-                id={`mrp_per_unit-${index}`}
-                className="w-full p-3 border border-transparent focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-lg text-gray-800 bg-gray-100 placeholder-gray-500 focus:outline-none"
-                placeholder="Enter MRP per unit"
-              />
-            )}
-          />
-          {errors.variants?.[index]?.mrp_per_unit && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.variants[index].mrp_per_unit.message}
-            </p>
-          )}
-        </div>
-        <div>
-          <label
-            htmlFor={`unit-${index}`}
-            className="block mb-2 text-sm font-medium text-[#4D4D4D]"
-          >
-            Unit <MandatoryField />
-          </label>
-          <Controller
-            name={`variants.${index}.unit`}
-            control={control}
-            defaultValue={null}
-            rules={{ required: "Unit is required" }}
-            render={({ field }) => (
-              <Select
-                {...field}
-                options={units.map((unit) => ({
-                  value: unit._id,
-                  label: unit.unit,
-                }))}
-                placeholder="Select Unit"
-                className="w-full"
-                classNamePrefix="react-select"
-                isClearable
-              />
-            )}
-          />
-          {errors.variants?.[index]?.unit && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.variants[index].unit.message}
-            </p>
-          )}
-        </div>
+        />
+        {errors.variants?.[index]?.quantity && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.variants[index].quantity.message}
+          </p>
+        )}
       </div>
-
+      <div>
+        <label
+          htmlFor={`mrp_per_unit-${index}`}
+          className="block mb-2 text-sm font-medium text-[#4D4D4D]"
+        >
+          MRP Per Unit <MandatoryField />
+        </label>
+        <Controller
+          name={`variants.${index}.mrp_per_unit`}
+          control={control}
+          defaultValue=""
+          rules={{
+            required: "MRP per unit is required",
+            min: { value: 0, message: "MRP per unit must be positive" },
+          }}
+          render={({ field }) => (
+            <input
+              {...field}
+              type="number"
+              id={`mrp_per_unit-${index}`}
+              className="w-full p-3 border border-transparent focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-lg text-gray-800 bg-gray-100 placeholder-gray-500 focus:outline-none"
+              placeholder="Enter MRP per unit"
+            />
+          )}
+        />
+        {errors.variants?.[index]?.mrp_per_unit && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.variants[index].mrp_per_unit.message}
+          </p>
+        )}
+      </div>
+      <div>
+        <label
+          htmlFor={`unit-${index}`}
+          className="block mb-2 text-sm font-medium text-[#4D4D4D]"
+        >
+          Unit <MandatoryField />
+        </label>
+        <Controller
+          name={`variants.${index}.unit`}
+          control={control}
+          defaultValue={null}
+          rules={{ required: "Unit is required" }}
+          render={({ field }) => (
+            <Select
+              {...field}
+              options={units.map((unit) => ({
+                value: unit._id,
+                label: unit.unit,
+              }))}
+              placeholder="Select Unit"
+              className="w-full"
+              classNamePrefix="react-select"
+              isClearable
+            />
+          )}
+        />
+        {errors.variants?.[index]?.unit && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.variants[index].unit.message}
+          </p>
+        )}
+      </div>
+      </div>
 
       {isOpenModal && (
         <DeleteSmModal
